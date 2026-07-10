@@ -1,0 +1,82 @@
+{
+  "templates": [
+    {
+      "id": "manufacturing_angel_investment_model_e9101108",
+      "label": "Manufacturing — Angel Investment Model",
+      "file": "Manufacturing_Angel Investment_Model.xlsx",
+      "currency": "INR",
+      "engine": "template_fill",
+      "purpose": "cma_data",
+      "universal": true,
+      "root": "templates",
+      "folder": "angel_investment",
+      "uploaded": true,
+      "source": "scan"
+    },
+    {
+      "id": "cma_report_template_124db327",
+      "label": "CMA Report Template",
+      "file": "CMA_Report_Template.xlsx",
+      "currency": "INR",
+      "engine": "template_fill",
+      "purpose": "cma_data",
+      "universal": true,
+      "root": "templates",
+      "folder": "bank_loan",
+      "uploaded": true,
+      "source": "scan"
+    },
+    {
+      "id": "cma_manufacturing_feasibility_study_d1b26a1d",
+      "label": "CMA Manufacturing — Feasibility Study",
+      "file": "CMA_Manufacturing_Feasibility Study_Blank_Template.xlsx",
+      "currency": "INR",
+      "engine": "template_fill",
+      "purpose": "cma_data",
+      "universal": true,
+      "root": "templates",
+      "folder": "feasibility_study",
+      "uploaded": true,
+      "source": "scan"
+    },
+    {
+      "id": "msme_financial_model_government_grant_ab20581f",
+      "label": "MSME Financial Model — Government Grant",
+      "file": "MSME_Financial_Model_Government Grant_BLANK_TEMPLATE.xlsx",
+      "currency": "INR",
+      "engine": "template_fill",
+      "purpose": "cma_data",
+      "universal": true,
+      "root": "templates",
+      "folder": "government_grant",
+      "uploaded": true,
+      "source": "scan"
+    },
+    {
+      "id": "vc_financial_model_0e0c3d86",
+      "label": "VC Financial Model",
+      "file": "VC_Financial_Model_BLANK_TEMPLATE (3).xlsx",
+      "currency": "INR",
+      "engine": "template_fill",
+      "purpose": "cma_data",
+      "universal": true,
+      "root": "templates",
+      "folder": "venture_capital",
+      "uploaded": true,
+      "source": "scan"
+    },
+    {
+      "id": "cma_report_template_multiindustry_18a1d963",
+      "label": "CMA Report Template MultiIndustry",
+      "file": "CMA_Report_Template_MultiIndustry (1).xlsx",
+      "currency": "INR",
+      "engine": "template_fill",
+      "purpose": "cma_data",
+      "universal": true,
+      "root": "templates",
+      "folder": "bank_loan",
+      "uploaded": true,
+      "source": "scan"
+    }
+  ]
+}

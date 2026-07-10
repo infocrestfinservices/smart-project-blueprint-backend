@@ -1,0 +1,61 @@
+{
+  "kpis": [
+    {
+      "label": "ROI",
+      "metric": "ROI",
+      "sheet": "Cover",
+      "cell": "D17",
+      "type": "percent"
+    },
+    {
+      "label": "Gross Margin (Yr 5)",
+      "metric": "Gross Margin",
+      "sheet": "Annual Summary",
+      "cell": "G12",
+      "type": "percent"
+    },
+    {
+      "label": "EBITDA Margin (Yr 5)",
+      "metric": "EBITDA Margin",
+      "sheet": "Annual Summary",
+      "cell": "G15",
+      "type": "percent"
+    },
+    {
+      "label": "Net Profit Margin (Yr 5)",
+      "metric": "Net Profit Margin",
+      "sheet": "Annual Summary",
+      "cell": "G22",
+      "type": "percent"
+    },
+    {
+      "label": "ROE",
+      "metric": "ROE",
+      "sheet": "Investment & ROI",
+      "cell": "D27",
+      "type": "percent"
+    },
+    {
+      "label": "Payback",
+      "metric": "Payback",
+      "sheet": "Investment & ROI",
+      "cell": "D28",
+      "type": "years"
+    },
+    {
+      "label": "NPV",
+      "metric": "NPV",
+      "sheet": "Investment & ROI",
+      "cell": "D30",
+      "type": "currency"
+    },
+    {
+      "label": "IRR",
+      "metric": "IRR",
+      "sheet": "Dashboard",
+      "cell": "F20",
+      "type": "percent"
+    }
+  ],
+  "checks": []
+}

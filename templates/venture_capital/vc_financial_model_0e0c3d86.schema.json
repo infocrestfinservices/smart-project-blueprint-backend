@@ -1,0 +1,721 @@
+{
+  "template_id": "vc_financial_model_0e0c3d86",
+  "file": "VC_Financial_Model_BLANK_TEMPLATE (3).xlsx",
+  "currency": "INR",
+  "truncated": false,
+  "groups": [
+    {
+      "title": "Instructions",
+      "sheet": "Instructions",
+      "fields": [
+        {
+          "cell": "B6",
+          "label": "1 · COLOUR LEGEND",
+          "hint": "enter your value here (this is an input)",
+          "default": null,
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "title": "Scenario Manager",
+      "sheet": "Scenario Manager",
+      "fields": [
+        {
+          "cell": "C4",
+          "label": "Active scenario (1=Base, 2=Upside, 3=Downside)",
+          "hint": "",
+          "default": 1,
+          "type": "number"
+        },
+        {
+          "cell": "C7",
+          "label": "Utilisation – steady ceiling — Base",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "D7",
+          "label": "Utilisation – steady ceiling — Upside",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "E7",
+          "label": "Utilisation – steady ceiling — Downside",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C8",
+          "label": "Utilisation – monthly step-up — Base",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "D8",
+          "label": "Utilisation – monthly step-up — Upside",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "E8",
+          "label": "Utilisation – monthly step-up — Downside",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C9",
+          "label": "Annual price escalation — Base",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "D9",
+          "label": "Annual price escalation — Upside",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "E9",
+          "label": "Annual price escalation — Downside",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C10",
+          "label": "RM – Product A (% rev) — Base",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "D10",
+          "label": "RM – Product A (% rev) — Upside",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "E10",
+          "label": "RM – Product A (% rev) — Downside",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C11",
+          "label": "RM – Product B (% rev) — Base",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "D11",
+          "label": "RM – Product B (% rev) — Upside",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "E11",
+          "label": "RM – Product B (% rev) — Downside",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C12",
+          "label": "Exit EV/EBITDA multiple — Base",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "D12",
+          "label": "Exit EV/EBITDA multiple — Upside",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "E12",
+          "label": "Exit EV/EBITDA multiple — Downside",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "title": "Assumptions",
+      "sheet": "Assumptions",
+      "fields": [
+        {
+          "cell": "C5",
+          "label": "Model start (FY begins Apr)",
+          "hint": "date · Indian FY Apr–Mar",
+          "default": null,
+          "type": "date"
+        },
+        {
+          "cell": "C6",
+          "label": "Commercial production starts in month",
+          "hint": "month # · Greenfield gestation ≈ 3 months",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C7",
+          "label": "Projection horizon",
+          "hint": "months · 5 years × 12",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C9",
+          "label": "Product A – installed capacity",
+          "hint": "units/mo · Primary product line",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C10",
+          "label": "Product B – installed capacity",
+          "hint": "units/mo · Secondary product line",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C11",
+          "label": "Utilisation – opening (month 4)",
+          "hint": "% cap · Greenfield ramp start",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C15",
+          "label": "Product A – realisation",
+          "hint": "₹/unit · Net selling price ex-GST",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C16",
+          "label": "Product B – realisation",
+          "hint": "₹/unit · Net selling price ex-GST",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C18",
+          "label": "GST on output (info)",
+          "hint": "% · CBIC – GST rate schedule",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C22",
+          "label": "RM efficiency gain",
+          "hint": "/yr · Scale procurement + yield",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C23",
+          "label": "Consumables & tooling",
+          "hint": "% rev · Inserts, coolant, perishables",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C24",
+          "label": "Energy intensity – Product A",
+          "hint": "kWh/unit · Machining energy/part",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C25",
+          "label": "Energy intensity – Product B",
+          "hint": "kWh/unit · Larger part / more ops",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C26",
+          "label": "Power tariff (HT industrial)",
+          "hint": "₹/kWh · Electricity regulator (SERC/CERC) tariff order",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C27",
+          "label": "Power tariff escalation",
+          "hint": "%/yr · Fuel-surcharge linked",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C29",
+          "label": "Direct labour – FY1",
+          "hint": "persons · Ramp-linked",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C30",
+          "label": "Direct labour – FY2",
+          "hint": "persons",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C31",
+          "label": "Direct labour – FY3",
+          "hint": "persons",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C32",
+          "label": "Direct labour – FY4",
+          "hint": "persons",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C33",
+          "label": "Direct labour – FY5",
+          "hint": "persons",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C34",
+          "label": "Average direct wage",
+          "hint": "₹/mo · Above statutory minimum wage (skilled) – CLC",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C35",
+          "label": "Indirect + admin – FY1",
+          "hint": "persons · Supervisors, QA, admin",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C36",
+          "label": "Indirect + admin – FY2",
+          "hint": "persons",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C37",
+          "label": "Indirect + admin – FY3",
+          "hint": "persons",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C38",
+          "label": "Indirect + admin – FY4",
+          "hint": "persons",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C39",
+          "label": "Indirect + admin – FY5",
+          "hint": "persons",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C40",
+          "label": "Average indirect salary",
+          "hint": "₹/mo",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C41",
+          "label": "Wage / salary escalation",
+          "hint": "%/yr · Above CPI (labour market) – MoSPI",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C43",
+          "label": "Factory rent & lease",
+          "hint": "₹L/mo · Leased shed (asset-light)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C44",
+          "label": "Rent escalation",
+          "hint": "%/yr · Lease step-up",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C45",
+          "label": "Maintenance (% of P&M/yr)",
+          "hint": "% p.a. · Preventive + spares",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C46",
+          "label": "Selling & distribution",
+          "hint": "% rev · Freight, marketing, commission",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C47",
+          "label": "Administrative & other",
+          "hint": "₹L/mo · Insurance, IT, travel, prof.",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C48",
+          "label": "Admin escalation",
+          "hint": "%/yr",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C50",
+          "label": "Term-loan interest",
+          "hint": "% p.a. · RBI repo 5.25% + MSME spread",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C51",
+          "label": "Working-capital loan interest",
+          "hint": "% p.a. · CC/OD pricing",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C52",
+          "label": "Bank WC funding (% of gap)",
+          "hint": "% gap · 25% margin from equity",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C53",
+          "label": "Effective corporate tax rate",
+          "hint": "% · 115BAA 22%+10% surcharge+4% cess",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C55",
+          "label": "Debtor days",
+          "hint": "days · OEM/Tier-1 terms",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C56",
+          "label": "Inventory days",
+          "hint": "days · RM+WIP+FG",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C57",
+          "label": "Creditor days",
+          "hint": "days · Supplier credit",
+          "default": null,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "title": "Fixed Assets",
+      "sheet": "Fixed Assets",
+      "fields": [
+        {
+          "cell": "D5",
+          "label": "Plant & machinery (incl. contingency)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "D6",
+          "label": "Utilities & electricals",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "D7",
+          "label": "Tools, dies & fixtures",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "D8",
+          "label": "Office, IT & ERP",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "D9",
+          "label": "Preliminary & pre-operative (amortised)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "title": "Funding",
+      "sheet": "Funding",
+      "fields": [
+        {
+          "cell": "C4",
+          "label": "Plant & machinery",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C5",
+          "label": "Utilities & electricals",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C6",
+          "label": "Tools, dies & fixtures",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C7",
+          "label": "Office, IT & ERP",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C8",
+          "label": "Preliminary & pre-operative",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C9",
+          "label": "Contingency",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C10",
+          "label": "Margin money for working capital",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C14",
+          "label": "Promoter equity",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C15",
+          "label": "VC equity — Series A (this round)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C16",
+          "label": "Term loan",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "title": "Cap Table",
+      "sheet": "Cap Table",
+      "fields": [
+        {
+          "cell": "C4",
+          "label": "Founder shares (nos.)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C5",
+          "label": "ESOP pool (% of post-Series A FD)",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C6",
+          "label": "Seed investment (₹ Lakh)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C7",
+          "label": "Seed pre-money (₹ Lakh)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C9",
+          "label": "Series A pre-money (₹ Lakh)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C10",
+          "label": "Series B investment — projected (₹ Lakh)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C11",
+          "label": "Series B pre-money — projected (₹ Lakh)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C12",
+          "label": "Series B round timing (FY)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "title": "DCF Valuation",
+      "sheet": "DCF Valuation",
+      "fields": [
+        {
+          "cell": "C4",
+          "label": "Risk-free rate (India 10Y G-sec)",
+          "hint": "CCIL / RBI",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C5",
+          "label": "Equity risk premium",
+          "hint": "India ERP",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C6",
+          "label": "Levered beta (sector)",
+          "hint": "Sector comparables (your sector)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C11",
+          "label": "Target equity weight",
+          "hint": "Long-run structure",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C30",
+          "label": "Terminal growth (g)",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        }
+      ]
+    },
+    {
+      "title": "Returns & Waterfall",
+      "sheet": "Returns & Waterfall",
+      "fields": [
+        {
+          "cell": "C13",
+          "label": "Preference multiple — Series A / Series B (C13)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "D13",
+          "label": "Preference multiple — Series A / Series B (D13)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "D31",
+          "label": "FY5 EBITDA ▼  /  Exit multiple ► — Proceeds",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "E31",
+          "label": "FY5 EBITDA ▼  /  Exit multiple ► — MOIC",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "F31",
+          "label": "FY5 EBITDA ▼  /  Exit multiple ► — Gross IRR",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "G31",
+          "label": "FY5 EBITDA ▼  /  Exit multiple ► (G31)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        }
+      ]
+    }
+  ]
+}

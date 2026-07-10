@@ -1,0 +1,76 @@
+{
+  "kpis": [
+    {
+      "label": "Current Ratio (Yr 5)",
+      "metric": "Current Ratio",
+      "sheet": "Ratios",
+      "cell": "G6",
+      "type": "ratio_x"
+    },
+    {
+      "label": "Debt–Equity (Yr 5)",
+      "metric": "Debt–Equity",
+      "sheet": "Ratios",
+      "cell": "G7",
+      "type": "ratio_x"
+    },
+    {
+      "label": "TOL / TNW (Yr 5)",
+      "metric": "TOL / TNW",
+      "sheet": "Ratios",
+      "cell": "G8",
+      "type": "ratio_x"
+    },
+    {
+      "label": "EBITDA Margin (Yr 5)",
+      "metric": "EBITDA Margin",
+      "sheet": "Ratios",
+      "cell": "G10",
+      "type": "percent"
+    },
+    {
+      "label": "Net Profit Margin (Yr 5)",
+      "metric": "Net Profit Margin",
+      "sheet": "Ratios",
+      "cell": "G11",
+      "type": "percent"
+    },
+    {
+      "label": "ROCE (Yr 5)",
+      "metric": "ROCE",
+      "sheet": "Ratios",
+      "cell": "G12",
+      "type": "percent"
+    },
+    {
+      "label": "Interest Coverage (Yr 5)",
+      "metric": "Interest Coverage",
+      "sheet": "Ratios",
+      "cell": "G14",
+      "type": "ratio_x"
+    },
+    {
+      "label": "DSCR (Yr 5)",
+      "metric": "DSCR",
+      "sheet": "Ratios",
+      "cell": "G15",
+      "type": "ratio_x"
+    },
+    {
+      "label": "Break-even (Yr 5)",
+      "metric": "Break-even",
+      "sheet": "Ratios",
+      "cell": "G16",
+      "type": "percent"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Check (Liabilities − Assets = 0)",
+      "sheet": "Form_III_BalanceSheet",
+      "cell": "C22",
+      "tolerance": 1.0,
+      "expect": 0.0
+    }
+  ]
+}

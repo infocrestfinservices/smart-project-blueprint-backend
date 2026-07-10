@@ -1,0 +1,69 @@
+{
+  "kpis": [
+    {
+      "label": "Gross Margin",
+      "metric": "Gross Margin",
+      "sheet": "Monthly Model",
+      "cell": "B30",
+      "type": "percent"
+    },
+    {
+      "label": "EBITDA Margin",
+      "metric": "EBITDA Margin",
+      "sheet": "Monthly Model",
+      "cell": "B41",
+      "type": "percent"
+    },
+    {
+      "label": "Net Profit Margin",
+      "metric": "Net Profit Margin",
+      "sheet": "Monthly Model",
+      "cell": "B50",
+      "type": "percent"
+    },
+    {
+      "label": "ROE",
+      "metric": "ROE",
+      "sheet": "Returns & Waterfall",
+      "cell": "C38",
+      "type": "percent"
+    },
+    {
+      "label": "ROCE",
+      "metric": "ROCE",
+      "sheet": "Returns & Waterfall",
+      "cell": "C39",
+      "type": "percent"
+    },
+    {
+      "label": "Payback",
+      "metric": "Payback",
+      "sheet": "Returns & Waterfall",
+      "cell": "C40",
+      "type": "years"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Balance check (assets − E&L)",
+      "sheet": "Balance Sheet",
+      "cell": "B19",
+      "tolerance": 1.0,
+      "expect": 0.0
+    },
+    {
+      "name": "Balance check (sources − uses)",
+      "sheet": "Funding",
+      "cell": "C18",
+      "tolerance": 1.0,
+      "expect": 0.0
+    },
+    {
+      "name": "Check: Σ proceeds = equity value",
+      "sheet": "Returns & Waterfall",
+      "cell": "C22",
+      "tolerance": 1.0,
+      "expect": 0.0
+    }
+  ]
+}

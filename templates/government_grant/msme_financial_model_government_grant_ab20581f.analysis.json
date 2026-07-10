@@ -1,0 +1,55 @@
+{
+  "kpis": [
+    {
+      "label": "EBITDA Margin (Yr 5)",
+      "metric": "EBITDA Margin",
+      "sheet": "Annual P&L",
+      "cell": "G10",
+      "type": "percent"
+    },
+    {
+      "label": "Net Profit Margin (Yr 5)",
+      "metric": "Net Profit Margin",
+      "sheet": "Annual P&L",
+      "cell": "G17",
+      "type": "percent"
+    },
+    {
+      "label": "IRR (Yr 6)",
+      "metric": "IRR",
+      "sheet": "Returns & Ratios",
+      "cell": "H11",
+      "type": "percent"
+    },
+    {
+      "label": "NPV (Yr 6)",
+      "metric": "NPV",
+      "sheet": "Returns & Ratios",
+      "cell": "H12",
+      "type": "currency"
+    },
+    {
+      "label": "DSCR (Yr 6)",
+      "metric": "DSCR",
+      "sheet": "Returns & Ratios",
+      "cell": "H16",
+      "type": "ratio_x"
+    },
+    {
+      "label": "Break-even (Yr 6)",
+      "metric": "Break-even",
+      "sheet": "Returns & Ratios",
+      "cell": "H21",
+      "type": "percent"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Check (Assets − E&L, must be 0)",
+      "sheet": "Balance Sheet",
+      "cell": "C22",
+      "tolerance": 1.0,
+      "expect": 0.0
+    }
+  ]
+}

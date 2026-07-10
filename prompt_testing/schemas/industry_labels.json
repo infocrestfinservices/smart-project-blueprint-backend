@@ -1,0 +1,155 @@
+{
+  "Agriculture & Farming": {
+    "cap_label": "Installed Capacity (land / livestock / output)",
+    "prod_unit_label": "Production (units)",
+    "cost1_long": "Raw material / input cost per unit (Year 1)",
+    "cost1_short": "Raw materials / inputs",
+    "cost2_long": "Power & fuel cost per unit (Year 1)",
+    "cost2_short": "Power & fuel",
+    "cost3_short": "Farm overheads"
+  },
+  "Technology & Software": {
+    "cap_label": "Service Delivery Capacity (billable hours/licenses p.a.)",
+    "prod_unit_label": "Service delivery (units)",
+    "cost1_long": "Direct delivery cost per unit (Year 1)",
+    "cost1_short": "Direct delivery cost",
+    "cost2_long": "Infrastructure & hosting cost per unit (Year 1)",
+    "cost2_short": "Infrastructure & hosting",
+    "cost3_short": "Operating overheads"
+  },
+  "Retail & E-Commerce": {
+    "cap_label": "Annual Purchase Capacity (units for resale)",
+    "prod_unit_label": "Purchase (units)",
+    "cost1_long": "Purchase cost of goods per unit (Year 1)",
+    "cost1_short": "Purchase cost of goods",
+    "cost2_long": "Freight & packaging cost per unit (Year 1)",
+    "cost2_short": "Freight & packaging",
+    "cost3_short": "Store overheads"
+  },
+  "Manufacturing": {
+    "cap_label": "Installed Capacity",
+    "prod_unit_label": "Production (units)",
+    "cost1_long": "Raw material cost per unit (Year 1)",
+    "cost1_short": "Raw materials",
+    "cost2_long": "Power & fuel cost per unit (Year 1)",
+    "cost2_short": "Power & fuel",
+    "cost3_short": "Factory overheads"
+  },
+  "Tourism & Hospitality": {
+    "cap_label": "Room / Cover Capacity (room-nights or covers p.a.)",
+    "prod_unit_label": "Rooms sold / covers served (units)",
+    "cost1_long": "Direct service cost per unit (F&B, housekeeping) (Year 1)",
+    "cost1_short": "Direct service cost",
+    "cost2_long": "Power & fuel cost per unit (Year 1)",
+    "cost2_short": "Power & fuel",
+    "cost3_short": "Property overheads"
+  },
+  "Renewable Energy": {
+    "cap_label": "Installed Generation Capacity (units of energy p.a.)",
+    "prod_unit_label": "Energy generated (units)",
+    "cost1_long": "O&M cost per unit generated (Year 1)",
+    "cost1_short": "O&M cost",
+    "cost2_long": "Grid / power evacuation cost per unit (Year 1)",
+    "cost2_short": "Grid / evacuation cost",
+    "cost3_short": "Plant overheads"
+  },
+  "Healthcare & Pharma": {
+    "cap_label": "Service / Production Capacity (patients or units p.a.)",
+    "prod_unit_label": "Patients served / units produced",
+    "cost1_long": "Consumables & medicine cost per unit (Year 1)",
+    "cost1_short": "Consumables & medicine",
+    "cost2_long": "Power & equipment running cost per unit (Year 1)",
+    "cost2_short": "Power & equipment cost",
+    "cost3_short": "Facility overheads"
+  },
+  "Education & Training": {
+    "cap_label": "Service Capacity (student seats / batches p.a.)",
+    "prod_unit_label": "Students / batches served",
+    "cost1_long": "Direct delivery cost per unit (faculty, material) (Year 1)",
+    "cost1_short": "Direct delivery cost",
+    "cost2_long": "Infrastructure cost per unit (Year 1)",
+    "cost2_short": "Infrastructure cost",
+    "cost3_short": "Institute overheads"
+  },
+  "General Business": {
+    "cap_label": "Capacity (units / customers / hours p.a.)",
+    "prod_unit_label": "Output (units)",
+    "cost1_long": "Direct cost per unit (Year 1)",
+    "cost1_short": "Direct cost",
+    "cost2_long": "Overhead cost per unit (Year 1)",
+    "cost2_short": "Overhead cost",
+    "cost3_short": "Operating overheads"
+  },
+  "Construction & Real Estate": {
+    "cap_label": "Project Execution Capacity (sq.ft / units p.a.)",
+    "prod_unit_label": "Construction / units completed",
+    "cost1_long": "Construction material cost per unit (Year 1)",
+    "cost1_short": "Construction materials",
+    "cost2_long": "Site power & machinery cost per unit (Year 1)",
+    "cost2_short": "Site power & machinery",
+    "cost3_short": "Project overheads"
+  },
+  "Food & Beverage / Restaurant": {
+    "cap_label": "Seating / Covers Capacity (covers p.a.)",
+    "prod_unit_label": "Covers served (units)",
+    "cost1_long": "Raw material (food & beverage) cost per unit (Year 1)",
+    "cost1_short": "Food & beverage cost",
+    "cost2_long": "Kitchen power & fuel cost per unit (Year 1)",
+    "cost2_short": "Kitchen power & fuel",
+    "cost3_short": "Restaurant overheads"
+  },
+  "Transportation & Logistics": {
+    "cap_label": "Fleet / Route Capacity (trips or tonnage p.a.)",
+    "prod_unit_label": "Trips / tonnage handled (units)",
+    "cost1_long": "Fuel & running cost per unit (Year 1)",
+    "cost1_short": "Fuel & running cost",
+    "cost2_long": "Vehicle maintenance cost per unit (Year 1)",
+    "cost2_short": "Vehicle maintenance",
+    "cost3_short": "Fleet overheads"
+  },
+  "Textile & Garments": {
+    "cap_label": "Installed Capacity (garments/fabric units p.a.)",
+    "prod_unit_label": "Production (units)",
+    "cost1_long": "Raw material (yarn/fabric) cost per unit (Year 1)",
+    "cost1_short": "Raw materials (yarn/fabric)",
+    "cost2_long": "Power & fuel cost per unit (Year 1)",
+    "cost2_short": "Power & fuel",
+    "cost3_short": "Factory overheads"
+  },
+  "Automobile / Auto Ancillary": {
+    "cap_label": "Installed Capacity (components/vehicles p.a.)",
+    "prod_unit_label": "Production (units)",
+    "cost1_long": "Raw material / component cost per unit (Year 1)",
+    "cost1_short": "Raw materials / components",
+    "cost2_long": "Power & fuel cost per unit (Year 1)",
+    "cost2_short": "Power & fuel",
+    "cost3_short": "Factory overheads"
+  },
+  "Import / Export Trading": {
+    "cap_label": "Annual Trading Capacity (units for import/export)",
+    "prod_unit_label": "Trading volume (units)",
+    "cost1_long": "Purchase / import cost per unit (Year 1)",
+    "cost1_short": "Purchase / import cost",
+    "cost2_long": "Freight, customs & logistics cost per unit (Year 1)",
+    "cost2_short": "Freight & customs",
+    "cost3_short": "Trading overheads"
+  },
+  "Media & Entertainment": {
+    "cap_label": "Content / Production Capacity (units/hours p.a.)",
+    "prod_unit_label": "Content produced (units)",
+    "cost1_long": "Production cost per unit (Year 1)",
+    "cost1_short": "Production cost",
+    "cost2_long": "Equipment & studio cost per unit (Year 1)",
+    "cost2_short": "Equipment & studio cost",
+    "cost3_short": "Studio overheads"
+  },
+  "Mining & Minerals": {
+    "cap_label": "Installed Extraction Capacity (tonnes p.a.)",
+    "prod_unit_label": "Extraction (units)",
+    "cost1_long": "Raw material / extraction cost per unit (Year 1)",
+    "cost1_short": "Extraction cost",
+    "cost2_long": "Power & fuel cost per unit (Year 1)",
+    "cost2_short": "Power & fuel",
+    "cost3_short": "Mine overheads"
+  }
+}

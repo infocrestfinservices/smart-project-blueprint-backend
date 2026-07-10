@@ -1,0 +1,509 @@
+{
+  "template_id": "msme_financial_model_government_grant_ab20581f",
+  "file": "MSME_Financial_Model_Government Grant_BLANK_TEMPLATE.xlsx",
+  "currency": "INR",
+  "truncated": false,
+  "groups": [
+    {
+      "title": "Assumptions",
+      "sheet": "Assumptions",
+      "fields": [
+        {
+          "cell": "C6",
+          "label": "Effective corporate tax rate (s.115BAA, incl. surcharge+cess)",
+          "hint": "% · s.115BAA 22% (eff. 25.17%); s.115BAB 15% (eff. 17.16%, sunset 31-Mar-2024) – ClearTax",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C7",
+          "label": "└ Alternative if s.115BAB eligible (new mfg, if applicable)",
+          "hint": "% · Corporate tax – Income Tax Dept (domestic company rates, AY 2025-26)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C8",
+          "label": "Annual escalation – selling price / realisation",
+          "hint": "% p.a. · Analyst estimate aligned to RBI CPI target band (4% ±2%)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C9",
+          "label": "Annual escalation – raw material & consumables",
+          "hint": "% p.a. · Analyst estimate aligned to RBI CPI target band (4% ±2%)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C10",
+          "label": "Annual escalation – wages & salaries",
+          "hint": "% p.a. · Analyst estimate aligned to RBI CPI target band (4% ±2%)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C11",
+          "label": "Annual escalation – other operating expenses",
+          "hint": "% p.a. · Analyst estimate aligned to RBI CPI target band (4% ±2%)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C12",
+          "label": "Working days per month",
+          "hint": "days · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C14",
+          "label": "Land & site development",
+          "hint": "₹ lakh · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C15",
+          "label": "Factory building & civil works",
+          "hint": "₹ lakh · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C16",
+          "label": "Plant & machinery (processing + packaging line)",
+          "hint": "₹ lakh · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C17",
+          "label": "Utilities – power, water, cold storage, DG, solar",
+          "hint": "₹ lakh · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C18",
+          "label": "Misc. fixed assets (furniture, IT, lab, ETP)",
+          "hint": "₹ lakh · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C19",
+          "label": "Preliminary & pre-operative expenses",
+          "hint": "₹ lakh · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C20",
+          "label": "Contingency (~2% of capital cost)",
+          "hint": "₹ lakh · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C21",
+          "label": "Margin money for working capital",
+          "hint": "₹ lakh · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C23",
+          "label": "Promoter contribution (equity)",
+          "hint": "% of project · CGTMSE collateral-free credit guarantee up to ₹5 cr (raised to ₹10 cr, Budget 2025) – MoMSME/SIDBI",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C24",
+          "label": "Term-loan interest rate (p.a.)",
+          "hint": "% p.a. · MSME term-loan / working-capital rates & RBI repo (~6.5% early-2026; term loans ~9-11%) – 2026 survey",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C25",
+          "label": "Term-loan tenure (incl. moratorium)",
+          "hint": "months · MSME term-loan / working-capital rates & RBI repo (~6.5% early-2026; term loans ~9-11%) – 2026 survey",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C26",
+          "label": "Moratorium on principal (interest serviced)",
+          "hint": "months · MSME term-loan / working-capital rates & RBI repo (~6.5% early-2026; term loans ~9-11%) – 2026 survey",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C27",
+          "label": "Working-capital finance rate (p.a.)",
+          "hint": "% p.a. · MSME term-loan / working-capital rates & RBI repo (~6.5% early-2026; term loans ~9-11%) – 2026 survey",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C28",
+          "label": "Working capital funded by bank",
+          "hint": "% of WC gap · CGTMSE collateral-free credit guarantee up to ₹5 cr (raised to ₹10 cr, Budget 2025) – MoMSME/SIDBI",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C30",
+          "label": "Installed capacity at 100% (finished product)",
+          "hint": "tonnes/mo · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C31",
+          "label": "Capacity utilisation – Year 1",
+          "hint": "% · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C32",
+          "label": "Capacity utilisation – Year 2",
+          "hint": "% · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C33",
+          "label": "Capacity utilisation – Year 3",
+          "hint": "% · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C34",
+          "label": "Capacity utilisation – Year 4",
+          "hint": "% · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C35",
+          "label": "Capacity utilisation – Year 5",
+          "hint": "% · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C37",
+          "label": "Average net realisation (ex-GST)",
+          "hint": "₹/tonne · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C38",
+          "label": "Raw material (farm produce incl. wastage)",
+          "hint": "₹/tonne · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C39",
+          "label": "Packaging & consumables",
+          "hint": "₹/tonne · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C40",
+          "label": "Direct utilities per tonne (power/steam/water)",
+          "hint": "₹/tonne · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C41",
+          "label": "Other direct / QC / logistics inward",
+          "hint": "₹/tonne · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C43",
+          "label": "Fixed power, fuel & DG (plant overhead)",
+          "hint": "₹ lakh/mo · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C44",
+          "label": "Repairs & maintenance",
+          "hint": "₹ lakh/mo · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C45",
+          "label": "Administrative & general overhead",
+          "hint": "₹ lakh/mo · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C46",
+          "label": "Selling, distribution & branding",
+          "hint": "% of revenue · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C47",
+          "label": "Insurance (assets + stock)",
+          "hint": "₹ lakh/mo · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C49",
+          "label": "Total headcount – Year 1",
+          "hint": "persons · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C50",
+          "label": "Total headcount – Year 2",
+          "hint": "persons · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C51",
+          "label": "Total headcount – Year 3",
+          "hint": "persons · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C52",
+          "label": "Total headcount – Year 4",
+          "hint": "persons · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C53",
+          "label": "Total headcount – Year 5",
+          "hint": "persons · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C54",
+          "label": "Average monthly wage (blended)",
+          "hint": "₹/person/mo · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C55",
+          "label": "Share of women in workforce",
+          "hint": "% · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C57",
+          "label": "Debtor / receivable days",
+          "hint": "days · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C58",
+          "label": "Inventory holding days",
+          "hint": "days · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C59",
+          "label": "Creditor / payable days",
+          "hint": "days · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C61",
+          "label": "Building depreciation rate",
+          "hint": "% p.a. · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C62",
+          "label": "Plant & machinery depreciation rate",
+          "hint": "% p.a. · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C63",
+          "label": "Utilities & misc depreciation rate",
+          "hint": "% p.a. · Management / DPR estimate (to be validated by promoter & appraising bank)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C65",
+          "label": "State capital investment subsidy (Aatmanirbhar Gujarat)",
+          "hint": "% of eFCI · Aatmanirbhar Gujarat Scheme for MSMEs 2022-27 (capital + interest subsidy) – myScheme (GoI)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C66",
+          "label": "└ Cap on capital subsidy",
+          "hint": "₹ lakh · Aatmanirbhar Gujarat incentives: capital + 7% interest subsidy, net-SGST & EPF reimbursement – EY / IPF",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C67",
+          "label": "Interest subsidy on term loan (Aatmanirbhar Gujarat)",
+          "hint": "% p.a. · Aatmanirbhar Gujarat incentives: capital + 7% interest subsidy, net-SGST & EPF reimbursement – EY / IPF",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C68",
+          "label": "└ Interest-subsidy cap per year",
+          "hint": "₹ lakh/yr · Aatmanirbhar Gujarat incentives: capital + 7% interest subsidy, net-SGST & EPF reimbursement – EY / IPF",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C69",
+          "label": "PMFME credit-linked subsidy (if micro food unit)",
+          "hint": "% of proj cost · PMFME – 35% credit-linked capital subsidy up to ₹10 lakh (micro food units) – MoFPI / myScheme",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C70",
+          "label": "└ PMFME cap per unit",
+          "hint": "₹ lakh · PMFME – 35% credit-linked capital subsidy up to ₹10 lakh (micro food units) – MoFPI / myScheme",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C71",
+          "label": "Net SGST reimbursement (indicative, on intra-state sales)",
+          "hint": "% of net SGST · Aatmanirbhar Gujarat incentives: capital + 7% interest subsidy, net-SGST & EPF reimbursement – EY / IPF",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C73",
+          "label": "Discount rate / WACC for NPV",
+          "hint": "% p.a. · Analyst estimate aligned to RBI CPI target band (4% ±2%)",
+          "default": null,
+          "type": "percent"
+        }
+      ]
+    },
+    {
+      "title": "Socio-Economic Impact",
+      "sheet": "Socio-Economic Impact",
+      "fields": [
+        {
+          "cell": "C5",
+          "label": "Employment multiplier (indirect+induced per direct job)",
+          "hint": "x · Standard agro-processing multiplier (management estimate)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C6",
+          "label": "Average annual procurement per farmer family",
+          "hint": "₹ lakh · Value of produce bought per supplier farmer p.a.",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C7",
+          "label": "Net GST contribution rate (indicative)",
+          "hint": "% of rev · Net of input-tax credit (management estimate)",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C19",
+          "label": "Local content of inputs (target)",
+          "hint": "% · Share sourced within Gujarat/region (target)",
+          "default": null,
+          "type": "percent"
+        }
+      ]
+    },
+    {
+      "title": "Sustainability (ESG)",
+      "sheet": "Sustainability (ESG)",
+      "fields": [
+        {
+          "cell": "C5",
+          "label": "Grid + captive energy use (Year 5)",
+          "hint": "kWh/yr · Estimated at full ramp",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C6",
+          "label": "Rooftop solar share of electricity",
+          "hint": "% · On-site renewable generation target",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C7",
+          "label": "Grid tariff (avoided cost)",
+          "hint": "₹/kWh · Industrial tariff, avoided via solar",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C8",
+          "label": "Grid emission factor",
+          "hint": "kg CO₂/kWh · CEA national average (approx.)",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C9",
+          "label": "Process water recycled (ETP/ZLD)",
+          "hint": "% · Reuse via effluent treatment",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C10",
+          "label": "Organic waste valorised (compost/biogas)",
+          "hint": "% · Diverted from landfill",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C11",
+          "label": "Post-harvest loss reduced (produce processed)",
+          "hint": "tonnes/yr · Perishables saved via processing",
+          "default": null,
+          "type": "number"
+        }
+      ]
+    }
+  ]
+}

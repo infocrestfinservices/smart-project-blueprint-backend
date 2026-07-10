@@ -1,0 +1,60 @@
+{
+  "_comment": "Field key -> Excel cell mapping for Assumptions sheet (CMA_Report_Template_MultiIndustry.xlsx). Keys are generic/fixed regardless of industry — only the *meaning* behind cost1/cost2 changes per industry (handled by the sheet's own label lookup, not by this agent).",
+
+  "name_of_unit":              { "cell": "Assumptions!C5",  "type": "text",  "example": "Green Valley Agro Exports" },
+  "constitution":              { "cell": "Assumptions!C6",  "type": "text",  "example": "Proprietorship" },
+  "line_of_activity":          { "cell": "Assumptions!C7",  "type": "text",  "example": "Export of processed agricultural produce" },
+  "industry_type":             { "cell": "Assumptions!J5",  "type": "enum",  "allowed": [
+      "Agriculture & Farming","Technology & Software","Retail & E-Commerce","Manufacturing",
+      "Tourism & Hospitality","Renewable Energy","Healthcare & Pharma","Education & Training",
+      "General Business","Construction & Real Estate","Food & Beverage / Restaurant",
+      "Transportation & Logistics","Textile & Garments","Automobile / Auto Ancillary",
+      "Import / Export Trading","Media & Entertainment","Mining & Minerals"
+  ]},
+
+  "term_loan_amount":          { "cell": "Assumptions!C8",  "type": "number", "unit": "INR" },
+  "promoters_capital":         { "cell": "Assumptions!C9",  "type": "number", "unit": "INR" },
+  "interest_rate_term_loan":   { "cell": "Assumptions!C10", "type": "percent" },
+  "term_loan_tenure_months":   { "cell": "Assumptions!C11", "type": "number", "unit": "months" },
+  "moratorium_months":         { "cell": "Assumptions!C12", "type": "number", "unit": "months" },
+  "interest_rate_wc":          { "cell": "Assumptions!C13", "type": "percent" },
+  "income_tax_rate":           { "cell": "Assumptions!C14", "type": "percent" },
+
+  "installed_capacity":        { "cell": "Assumptions!C16", "type": "number", "note": "meaning depends on industry: units/land-output/billable-hours/tonnage etc." },
+  "capacity_utilisation_y1_y5":{ "cell": "Assumptions!C18:G18", "type": "percent_array", "length": 5 },
+  "monthly_seasonality_weights":{ "cell": "Assumptions!C21:N21", "type": "number_array", "length": 12, "note": "relative weights, e.g. 1.0 each for flat, or seasonal skew" },
+
+  "selling_price_y1":          { "cell": "Assumptions!C23", "type": "number", "unit": "INR per unit" },
+  "selling_price_escalation":  { "cell": "Assumptions!C24", "type": "percent", "note": "annual" },
+  "cost1_per_unit_y1":         { "cell": "Assumptions!C25", "type": "number", "note": "primary direct cost — raw material / purchase cost / food cost / fuel cost etc. depending on industry" },
+  "cost1_escalation":          { "cell": "Assumptions!C26", "type": "percent", "note": "annual" },
+  "cost2_per_unit_y1":         { "cell": "Assumptions!C27", "type": "number", "note": "secondary direct cost — power & fuel / freight / infra cost etc." },
+  "cost2_escalation":          { "cell": "Assumptions!C28", "type": "percent", "note": "annual" },
+  "other_variable_cost_y1":    { "cell": "Assumptions!C29", "type": "number", "unit": "INR per unit" },
+  "other_variable_escalation": { "cell": "Assumptions!C30", "type": "percent", "note": "annual" },
+
+  "wages_monthly_y1":          { "cell": "Assumptions!C32", "type": "number", "unit": "INR per month" },
+  "wages_escalation":          { "cell": "Assumptions!C33", "type": "percent", "note": "annual" },
+  "factory_overheads_monthly_y1": { "cell": "Assumptions!C34", "type": "number", "unit": "INR per month" },
+  "factory_oh_escalation":     { "cell": "Assumptions!C35", "type": "percent", "note": "annual" },
+  "repairs_maintenance_monthly_y1": { "cell": "Assumptions!C36", "type": "number", "unit": "INR per month" },
+  "rm_escalation":             { "cell": "Assumptions!C37", "type": "percent", "note": "annual" },
+  "admin_expenses_monthly_y1": { "cell": "Assumptions!C38", "type": "number", "unit": "INR per month" },
+  "admin_escalation":          { "cell": "Assumptions!C39", "type": "percent", "note": "annual" },
+  "selling_distribution":      { "cell": "Assumptions!C40", "type": "percent", "note": "Selling & Distribution expense as a decimal fraction of sales revenue (e.g. 0.02 = 2% of sales). The Excel cell is formatted as a percentage and the downstream formula multiplies this by monthly sales revenue directly — this is confirmed correct, not an absolute rupee amount." },
+
+  "land_cost":                 { "cell": "Assumptions!C42", "type": "number", "unit": "INR" },
+  "building_cost":             { "cell": "Assumptions!C43", "type": "number", "unit": "INR" },
+  "building_dep_rate":         { "cell": "Assumptions!C44", "type": "percent" },
+  "plant_machinery_cost":      { "cell": "Assumptions!C45", "type": "number", "unit": "INR" },
+  "plant_machinery_dep_rate":  { "cell": "Assumptions!C46", "type": "percent" },
+  "furniture_other_cost":      { "cell": "Assumptions!C47", "type": "number", "unit": "INR" },
+  "furniture_dep_rate":        { "cell": "Assumptions!C48", "type": "percent" },
+
+  "raw_material_holding_days": { "cell": "Assumptions!C50", "type": "number", "unit": "days", "note": "for trading/service businesses this = inventory-of-goods-for-resale holding days" },
+  "finished_goods_holding_days":{ "cell": "Assumptions!C51", "type": "number", "unit": "days" },
+  "receivables_days":          { "cell": "Assumptions!C52", "type": "number", "unit": "days" },
+  "payables_days":             { "cell": "Assumptions!C53", "type": "number", "unit": "days" },
+  "min_cash_balance":          { "cell": "Assumptions!C54", "type": "number", "unit": "INR" },
+  "wc_margin_pct":             { "cell": "Assumptions!C55", "type": "percent" }
+}
