@@ -14,15 +14,35 @@ from enum import Enum
 
 class Industry(str, Enum):
     """Business industries the engine can model. Extend by adding a member here
-    and registering a definition in the IndustryRegistry."""
-    MANUFACTURING = "manufacturing"
-    RESTAURANT = "restaurant"
-    HOTEL = "hotel"
-    HOSPITAL = "hospital"
-    RETAIL = "retail"
-    SOFTWARE = "software"
-    EDUCATION = "education"
-    OTHER = "other"
+    and registering a definition in the IndustryRegistry.
+
+    The canonical list is the one users actually pick from: the 17 keys of the live
+    workbook's INDUSTRY_MAP (Assumptions!$S$5:$S$40), which drive its dropdown and
+    every industry-dependent label. Each member's human-facing name is the matching
+    INDUSTRY_MAP key, carried on the industry profile as `display_name` rather than
+    duplicated here — profiles are the one place an industry is described.
+
+    Member VALUES are deliberately unchanged from the original eight, so existing
+    profiles/tests keep resolving; only the human-facing names widened (e.g. HOTEL
+    covers "Tourism & Hospitality", HOSPITAL covers "Healthcare & Pharma").
+    """
+    MANUFACTURING = "manufacturing"          # Manufacturing
+    RESTAURANT = "restaurant"                # Food & Beverage / Restaurant
+    HOTEL = "hotel"                          # Tourism & Hospitality
+    HOSPITAL = "hospital"                    # Healthcare & Pharma
+    RETAIL = "retail"                        # Retail & E-Commerce
+    SOFTWARE = "software"                    # Technology & Software
+    EDUCATION = "education"                  # Education & Training
+    OTHER = "other"                          # General Business
+    AGRICULTURE = "agriculture"              # Agriculture & Farming
+    RENEWABLE_ENERGY = "renewable_energy"    # Renewable Energy
+    CONSTRUCTION = "construction"            # Construction & Real Estate
+    TRANSPORT = "transport"                  # Transportation & Logistics
+    TEXTILE = "textile"                      # Textile & Garments
+    AUTOMOBILE = "automobile"                # Automobile / Auto Ancillary
+    TRADING = "trading"                      # Import / Export Trading
+    MEDIA = "media"                          # Media & Entertainment
+    MINING = "mining"                        # Mining & Minerals
 
 
 class ReportPurpose(str, Enum):

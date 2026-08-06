@@ -1,0 +1,365 @@
+{
+  "_comment": "Purpose-specific EXTENSION fields, layered on top of the 44-field base schema in assumption_schema.json. The base schema is never repeated here and is never modified — each purpose lists ONLY the extra assumptions that purpose genuinely needs. Bank Loan is deliberately empty: it is fully served by the base 44 fields, so its behaviour is byte-identical to before this file existed. Extension fields have no `cell` mapping because the CMA workbook has no input cells for them; they are produced by the AI as purpose context (the mapper passes unmapped keys through untouched). Give an extension field a `cell` only once a template actually has an input cell for it.",
+
+  "_aliases": {
+    "bank_loan": "Bank Loan",
+    "cma_data": "Bank Loan",
+    "feasibility_study": "Feasibility Study",
+    "feasibility": "Feasibility Study",
+    "government_grant": "Government Grant",
+    "venture_capital": "Venture Capital",
+    "angel_investment": "Angel Investment",
+    "immigration_business_plan": "Immigration Business Plan",
+    "immigration": "Immigration Business Plan",
+    "internal_business_planning": "Internal Business Planning",
+    "internal_planning": "Internal Business Planning",
+    "real_estate": "Real Estate",
+    "startup_sme_fundraising": "Startup & SME Fundraising",
+    "startup_fundraising": "Startup & SME Fundraising"
+  },
+
+  "Bank Loan": {
+    "description": "Bank term-loan / CMA appraisal. Fully covered by the base 44 fields (DSCR, MPBF, ratios all derive from them). No extensions — do not add any without a template cell to write them into.",
+    "additional_fields": []
+  },
+
+  "Feasibility Study": {
+    "description": "Go/no-go viability appraisal. Judged on discounted returns (NPV/IRR/payback) over the project's life, not on debt service — so it needs a discount rate and a horizon the base schema does not carry.",
+    "additional_fields": [
+      {
+        "key": "discount_rate",
+        "label": "Discount rate (WACC)",
+        "type": "percent",
+        "cell": null,
+        "description": "Weighted average cost of capital used to discount future cash flows, as a decimal fraction (e.g. 0.14 = 14%). Reflect the actual debt/equity mix and Indian cost of capital for this industry."
+      },
+      {
+        "key": "project_life_years",
+        "label": "Project life",
+        "type": "number",
+        "unit": "years",
+        "cell": null,
+        "description": "Economic life of the project used for NPV/IRR, typically 10-20 years for manufacturing, shorter for asset-light businesses."
+      },
+      {
+        "key": "terminal_growth_rate",
+        "label": "Terminal growth rate",
+        "type": "percent",
+        "cell": null,
+        "description": "Perpetual growth beyond the projection horizon, as a decimal fraction. Must be modest (typically 0.02-0.04) and never exceed the discount rate."
+      },
+      {
+        "key": "sensitivity_downside_pct",
+        "label": "Downside sensitivity",
+        "type": "percent",
+        "cell": null,
+        "description": "Adverse swing applied to price/volume in the sensitivity case, as a decimal fraction (e.g. 0.10 = a 10% downside scenario)."
+      }
+    ]
+  },
+
+  "Government Grant": {
+    "description": "Subsidy / capital-subsidy scheme appraisal. The grant changes the funding structure and the effective project cost, so the subsidy mechanics must be explicit.",
+    "additional_fields": [
+      {
+        "key": "scheme_name",
+        "label": "Scheme name",
+        "type": "text",
+        "cell": null,
+        "description": "The specific subsidy scheme applied for (e.g. PMEGP, CLCSS, a State capital subsidy). Use the user's stated scheme if given."
+      },
+      {
+        "key": "subsidy_percentage",
+        "label": "Subsidy percentage",
+        "type": "percent",
+        "cell": null,
+        "description": "Share of eligible project cost the scheme reimburses, as a decimal fraction (e.g. 0.25 = 25%)."
+      },
+      {
+        "key": "subsidy_cap",
+        "label": "Subsidy cap",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Absolute ceiling on the subsidy amount under the scheme, regardless of the percentage."
+      },
+      {
+        "key": "eligible_capex_amount",
+        "label": "Eligible capex",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Portion of project cost that qualifies for subsidy (typically plant & machinery; land is usually excluded)."
+      },
+      {
+        "key": "grant_release_year",
+        "label": "Grant release year",
+        "type": "number",
+        "cell": null,
+        "description": "Projection year (1-5) in which the subsidy is actually received in cash. Most schemes disburse after commissioning, so this is rarely Year 1."
+      }
+    ]
+  },
+
+  "Venture Capital": {
+    "description": "Institutional equity round. Judged on ownership, valuation and exit return, not on debt service.",
+    "additional_fields": [
+      {
+        "key": "funding_amount_sought",
+        "label": "Funding amount sought",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Equity capital being raised in this round."
+      },
+      {
+        "key": "pre_money_valuation",
+        "label": "Pre-money valuation",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Company valuation immediately before this round. Must be consistent with equity_offered and funding_amount_sought."
+      },
+      {
+        "key": "equity_offered",
+        "label": "Equity offered",
+        "type": "percent",
+        "cell": null,
+        "description": "Ownership stake given to investors in this round, as a decimal fraction (e.g. 0.15 = 15%). Must equal funding_amount_sought / (pre_money_valuation + funding_amount_sought)."
+      },
+      {
+        "key": "valuation_method",
+        "label": "Valuation method",
+        "type": "text",
+        "cell": null,
+        "description": "Basis of the valuation (e.g. 'Revenue multiple', 'DCF', 'Comparable transactions')."
+      },
+      {
+        "key": "exit_multiple",
+        "label": "Exit multiple",
+        "type": "number",
+        "unit": "x",
+        "cell": null,
+        "description": "Expected exit valuation as a multiple of the exit-year metric (revenue or EBITDA). State which in valuation_method."
+      },
+      {
+        "key": "expected_exit_year",
+        "label": "Expected exit year",
+        "type": "number",
+        "cell": null,
+        "description": "Projection year in which investors expect a liquidity event (typically 5-7)."
+      }
+    ]
+  },
+
+  "Angel Investment": {
+    "description": "Early-stage individual equity. Same shape as VC but smaller, with founder dilution as the headline concern.",
+    "additional_fields": [
+      {
+        "key": "funding_amount_sought",
+        "label": "Funding amount sought",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Equity capital being raised from the angel investor(s)."
+      },
+      {
+        "key": "pre_money_valuation",
+        "label": "Pre-money valuation",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Company valuation immediately before this investment."
+      },
+      {
+        "key": "equity_offered",
+        "label": "Equity offered",
+        "type": "percent",
+        "cell": null,
+        "description": "Ownership stake given to the angel, as a decimal fraction. Must equal funding_amount_sought / (pre_money_valuation + funding_amount_sought)."
+      },
+      {
+        "key": "founder_dilution",
+        "label": "Founder dilution",
+        "type": "percent",
+        "cell": null,
+        "description": "Reduction in founders' combined ownership caused by this round, as a decimal fraction."
+      },
+      {
+        "key": "expected_exit_year",
+        "label": "Expected exit year",
+        "type": "number",
+        "cell": null,
+        "description": "Projection year in which the angel expects an exit or secondary sale."
+      }
+    ]
+  },
+
+  "Immigration Business Plan": {
+    "description": "Investor-visa business plan. The immigration authority judges job creation and committed investment, not lender ratios.",
+    "additional_fields": [
+      {
+        "key": "visa_program",
+        "label": "Visa program",
+        "type": "text",
+        "cell": null,
+        "description": "The specific program the plan supports (e.g. EB-5, E-2, UK Innovator Founder, Canada Start-up Visa). Use the user's stated program if given."
+      },
+      {
+        "key": "investment_commitment",
+        "label": "Investment commitment",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Capital the applicant commits to inject, as required by the program's threshold."
+      },
+      {
+        "key": "local_employment_target",
+        "label": "Local employment target",
+        "type": "number",
+        "unit": "jobs",
+        "cell": null,
+        "description": "Number of qualifying local jobs the business commits to create (e.g. 10 for EB-5)."
+      },
+      {
+        "key": "employment_creation_year",
+        "label": "Employment creation year",
+        "type": "number",
+        "cell": null,
+        "description": "Projection year by which the full employment target is met (programs usually require this within 2-3 years)."
+      },
+      {
+        "key": "promoter_net_worth",
+        "label": "Promoter net worth",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Applicant's declared net worth, evidencing lawful source of the invested funds."
+      }
+    ]
+  },
+
+  "Internal Business Planning": {
+    "description": "Management's own plan. No external party to satisfy — the question is growth, expansion timing and target margins.",
+    "additional_fields": [
+      {
+        "key": "strategic_growth_rate",
+        "label": "Strategic growth rate",
+        "type": "percent",
+        "cell": null,
+        "description": "Management's targeted annual revenue growth beyond the base capacity ramp, as a decimal fraction."
+      },
+      {
+        "key": "expansion_capex",
+        "label": "Expansion capex",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Additional capital investment planned during the projection period, over and above the initial project cost."
+      },
+      {
+        "key": "expansion_year",
+        "label": "Expansion year",
+        "type": "number",
+        "cell": null,
+        "description": "Projection year in which the expansion capex is incurred."
+      },
+      {
+        "key": "target_operating_margin",
+        "label": "Target operating margin",
+        "type": "percent",
+        "cell": null,
+        "description": "EBITDA margin management is steering towards by the end of the projection, as a decimal fraction."
+      }
+    ]
+  },
+
+  "Real Estate": {
+    "description": "Property development / rental. Revenue is driven by saleable area and absorption, not by units of production — these fields carry that structure.",
+    "additional_fields": [
+      {
+        "key": "saleable_area_sqft",
+        "label": "Saleable area",
+        "type": "number",
+        "unit": "sqft",
+        "cell": null,
+        "description": "Total saleable / leasable built-up area of the project."
+      },
+      {
+        "key": "sale_price_per_sqft",
+        "label": "Sale price per sqft",
+        "type": "number",
+        "unit": "INR/sqft",
+        "cell": null,
+        "description": "Expected realisation per saleable square foot at current prices."
+      },
+      {
+        "key": "absorption_rate",
+        "label": "Absorption rate",
+        "type": "percent",
+        "cell": null,
+        "description": "Share of saleable area sold/leased per year, as a decimal fraction (e.g. 0.30 = 30% of inventory absorbed annually)."
+      },
+      {
+        "key": "construction_period_months",
+        "label": "Construction period",
+        "type": "number",
+        "unit": "months",
+        "cell": null,
+        "description": "Months from project start to completion, during which there is capex but little or no revenue."
+      },
+      {
+        "key": "rental_yield_pct",
+        "label": "Rental yield",
+        "type": "percent",
+        "cell": null,
+        "description": "Annual rent as a fraction of asset value, for any portion held rather than sold. Set to 0 for a pure sale model."
+      }
+    ]
+  },
+
+  "Startup & SME Fundraising": {
+    "description": "Early-stage raise judged on runway and burn, not on profitability or debt service.",
+    "additional_fields": [
+      {
+        "key": "funding_round",
+        "label": "Funding round",
+        "type": "text",
+        "cell": null,
+        "description": "Stage of the raise (e.g. 'Pre-seed', 'Seed', 'Series A')."
+      },
+      {
+        "key": "funding_amount_sought",
+        "label": "Funding amount sought",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Capital being raised in this round."
+      },
+      {
+        "key": "monthly_burn_rate",
+        "label": "Monthly burn rate",
+        "type": "number",
+        "unit": "INR per month",
+        "cell": null,
+        "description": "Net monthly cash outflow at the start of the projection (gross costs less any revenue)."
+      },
+      {
+        "key": "runway_months",
+        "label": "Runway",
+        "type": "number",
+        "unit": "months",
+        "cell": null,
+        "description": "Months the raised capital funds operations at the stated burn rate. Must be consistent with funding_amount_sought / monthly_burn_rate."
+      },
+      {
+        "key": "customer_acquisition_cost",
+        "label": "Customer acquisition cost",
+        "type": "number",
+        "unit": "INR",
+        "cell": null,
+        "description": "Sales and marketing spend required to win one paying customer."
+      }
+    ]
+  }
+}

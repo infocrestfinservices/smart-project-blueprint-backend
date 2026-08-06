@@ -10,63 +10,63 @@
       "fields": [
         {
           "cell": "D6",
-          "label": "Company / Project Name",
+          "label": "text — Year 1",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D7",
-          "label": "Plant Location",
+          "label": "text — Year 1",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D8",
-          "label": "Primary Product / Description",
+          "label": "text — Year 1",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D9",
-          "label": "Projection Start Date",
+          "label": "date",
           "hint": "",
           "default": null,
           "type": "date"
         },
         {
           "cell": "D11",
-          "label": "Installed Capacity — Year 1",
+          "label": "units/month — Year 1",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "E11",
-          "label": "Installed Capacity — Year 2",
+          "label": "units/month — Year 2",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "F11",
-          "label": "Installed Capacity — Year 3",
+          "label": "units/month — Year 3",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "G11",
-          "label": "Installed Capacity — Year 4",
+          "label": "units/month — Year 4",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "H11",
-          "label": "Installed Capacity — Year 5",
+          "label": "units/month — Year 5",
           "hint": "",
           "default": null,
           "type": "number"
@@ -115,252 +115,252 @@
         },
         {
           "cell": "D15",
-          "label": "Sell-through Rate",
+          "label": "% of output",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D16",
-          "label": "Average Selling Price / unit (D16)",
+          "label": "₹/unit (D16)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "E16",
-          "label": "Average Selling Price / unit (E16)",
+          "label": "₹/unit (E16)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "F16",
-          "label": "Average Selling Price / unit (F16)",
+          "label": "₹/unit (F16)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "G16",
-          "label": "Average Selling Price / unit (G16)",
+          "label": "₹/unit (G16)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "H16",
-          "label": "Average Selling Price / unit (H16)",
+          "label": "₹/unit (H16)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D17",
-          "label": "Sales Discount / Returns",
+          "label": "% of sales",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D19",
-          "label": "Raw Material Cost / unit (D19)",
+          "label": "₹/unit (D19)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "E19",
-          "label": "Raw Material Cost / unit (E19)",
+          "label": "₹/unit (E19)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "F19",
-          "label": "Raw Material Cost / unit (F19)",
+          "label": "₹/unit (F19)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "G19",
-          "label": "Raw Material Cost / unit (G19)",
+          "label": "₹/unit (G19)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "H19",
-          "label": "Raw Material Cost / unit (H19)",
+          "label": "₹/unit (H19)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D20",
-          "label": "Packaging & Consumables / unit",
+          "label": "₹/unit (D20)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D21",
-          "label": "Power & Fuel / unit",
+          "label": "₹/unit (D21)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D22",
-          "label": "Other Variable Cost / unit",
+          "label": "₹/unit (D22)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D24",
-          "label": "Direct Labour Cost (D24)",
+          "label": "₹/month (D24)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "E24",
-          "label": "Direct Labour Cost (E24)",
+          "label": "₹/month (E24)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "F24",
-          "label": "Direct Labour Cost (F24)",
+          "label": "₹/month (F24)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "G24",
-          "label": "Direct Labour Cost (G24)",
+          "label": "₹/month (G24)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "H24",
-          "label": "Direct Labour Cost (H24)",
+          "label": "₹/month (H24)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D25",
-          "label": "Factory Rent / Lease",
+          "label": "₹/month (D25)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D26",
-          "label": "Repairs & Maintenance",
+          "label": "₹/month (D26)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D27",
-          "label": "Factory Utilities & Misc Overhead",
+          "label": "₹/month (D27)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D28",
-          "label": "Quality, Testing & Other Mfg OH",
+          "label": "₹/month (D28)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D30",
-          "label": "Admin & Management Salaries",
+          "label": "₹/month (D30)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D31",
-          "label": "Marketing & Selling",
+          "label": "% of revenue (D31)",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D32",
-          "label": "Distribution & Freight-out",
+          "label": "% of revenue (D32)",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D33",
-          "label": "Office Rent & Admin Overhead",
+          "label": "₹/month (D33)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D34",
-          "label": "Insurance",
+          "label": "₹/month (D34)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D35",
-          "label": "Other Operating Expenses",
+          "label": "₹/month (D35)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D36",
-          "label": "Annual Cost Inflation",
+          "label": "% p.a. (D36)",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D38",
-          "label": "Receivable Days (Debtors)",
+          "label": "days (D38)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D39",
-          "label": "Inventory Days",
+          "label": "days (D39)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D40",
-          "label": "Payable Days (Creditors)",
+          "label": "days (D40)",
           "hint": "",
           "default": null,
           "type": "number"
         },
         {
           "cell": "D42",
-          "label": "Term Loan Interest Rate",
+          "label": "% p.a. (D42)",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D43",
-          "label": "Loan Tenure",
+          "label": "years (D43)",
           "hint": "",
           "default": null,
           "type": "number"
@@ -409,42 +409,42 @@
         },
         {
           "cell": "D51",
-          "label": "Contingency",
+          "label": "% of assets",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D52",
-          "label": "Depreciation Rate – Building",
+          "label": "% p.a. (D52)",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D53",
-          "label": "Depreciation Rate – Plant & Machinery",
+          "label": "% p.a. (D53)",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D54",
-          "label": "Depreciation Rate – Furniture",
+          "label": "% p.a. (D54)",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D55",
-          "label": "Depreciation Rate – Vehicles",
+          "label": "% p.a. (D55)",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D56",
-          "label": "Preliminary Exp. Amortisation",
+          "label": "years (D56)",
           "hint": "",
           "default": null,
           "type": "number"
@@ -479,14 +479,14 @@
         },
         {
           "cell": "D63",
-          "label": "Discount Rate for NPV",
+          "label": "% p.a. (D63)",
           "hint": "",
           "default": null,
           "type": "percent"
         },
         {
           "cell": "D64",
-          "label": "Planned Exit Year",
+          "label": "1–5",
           "hint": "",
           "default": null,
           "type": "number"

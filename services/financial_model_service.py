@@ -29,9 +29,25 @@ def _required_headers(config) -> dict:
 
 
 def build_prompt(project: dict, purpose_key: str, agent_context: str,
-                 sample_blueprint: str = "") -> str:
+                 sample_blueprint: str = "", user_instructions: str = "") -> str:
     config = get_config(purpose_key)
     needed = _required_headers(config)
+
+    # What the client asked for in their own words. This is a first-class block, not part
+    # of agent_context: that block is labelled "supporting analysis ... do not contradict"
+    # and is truncated, so a request buried in it was outranked by the hard output rules
+    # below and the report came back unchanged.
+    ask = (user_instructions or "").strip()
+    ask_block = f"""
+CLIENT'S OWN REQUIREMENTS FOR THIS REPORT — HIGHEST PRIORITY:
+{ask}
+
+These are instructions from the person the report is for. Follow them. They outrank the
+default section list and the default emphasis. If they ask for content that does not fit
+any required section, ADD a new narrative section for it (see the narrative rules below).
+The one thing you must never do is bend a number to satisfy them: if what they want cannot
+be shown from the figures, say so plainly in the report instead of inventing it.
+""" if ask else ""
 
     sample_block = ""
     if sample_blueprint:
@@ -53,13 +69,35 @@ SAMPLE REPORT BLUEPRINT — this is the reference template for this PURPOSE. Tre
             line += f'  [MUST include these exact column headers so charts work: {req}]'
         sheet_specs.append(line)
 
+    # "Business Model" is required of EVERY purpose, not listed per-purpose: a lender reads
+    # it to understand what they are lending against before any projection means anything.
+    # It is rendered near the front of the report, straight after the executive summary.
     section_specs = [f'- "{w["title"]}": {w["guidance"]}' for w in config["word_sections"]]
+    # The summary opens the report and used to run to under half a page, leaving white
+    # space where a credit officer expects the whole case. It is the one section a reader
+    # may read alone, so it is held to a length, not left to "concise".
+    section_specs.append(
+        '- "Executive Summary": must fill A FULL PAGE — at least 500 words in 5-7 '
+        'substantial paragraphs of continuous prose (no headings, no bullets). Cover what '
+        'the business is and proposes to do, the promoter, the market and demand, the cost '
+        'of the project and how it is funded, the projected results and what they mean for '
+        'viability, the coverage available to the lender, and the risks with their '
+        'mitigation. A reader who reads only this page must understand the whole proposal.')
+    section_specs.append(
+        '- "Business Model": REQUIRED. Explain in full how this specific business makes '
+        'money — what exactly is sold and to whom, the revenue streams and roughly what '
+        'share each contributes, how it is priced, the channels and how customers are won, '
+        'the cost structure (what is fixed, what varies with volume), the working-capital '
+        'cycle (who pays when, what stock is held), the key operating drivers the profit '
+        'depends on, and what makes the model defensible. Write it about THIS business '
+        'using its own numbers and inputs, not a textbook description of the industry. '
+        '4-6 substantial paragraphs; bullet lines allowed.')
     answers = project.get("purpose_answers") or {}
 
     currency = project.get("currency") or "INR"
 
     return f"""You are a senior Chartered Accountant and financial modeller. You do NOT use a fixed template — you first consider the REPORT PURPOSE below, decide the correct financial-modelling methodology and reporting standard for it, and then produce the model.
-
+{ask_block}
 REPORT PURPOSE: {config['label']}
 INDUSTRY: {project.get('industry') or 'N/A'}  (sub: {project.get('sub_industry') or 'N/A'})
 COUNTRY / CURRENCY: {project.get('country') or 'N/A'} / {currency}
@@ -92,10 +130,19 @@ Return ONLY a single JSON object (no markdown, no commentary) with EXACTLY this 
 The "sheets" array MUST contain exactly these sheets, in this order, each with sensible columns and fully populated numeric rows:
 {chr(10).join(sheet_specs)}
 
-The "narrative" object MUST contain exactly these keys:
+The "narrative" object MUST contain AT LEAST these keys:
 {chr(10).join(section_specs)}
 
-Rules:
+You MAY add further narrative keys beyond this list, but ONLY to satisfy the client's own
+requirements above. Give any such section a short, self-explanatory title (e.g. "Monthly
+Revenue Break-up"); it will be rendered after the standard sections. Add nothing extra if
+the client asked for nothing extra.
+
+Rules:{f'''
+- The client's own requirements at the top of this prompt take priority over the default
+  structure and emphasis. Re-read them before you write the narrative, and make the change
+  they asked for visible in the output — do not return the same report you would have
+  written without them.''' if ask else ''}
 - Numbers are numbers, not strings. The first column of a sheet is a label (string); other columns are numeric where applicable.
 - Keep each sheet to the rows that matter (typically 4-15 rows). Include a final "Total" row where it makes accounting sense and set "total_row": true for that sheet.
 - Do NOT put large financial tables inside the narrative — tables belong in "sheets".
@@ -123,10 +170,18 @@ def _extract_json(text: str) -> dict:
 
 
 def generate_financial_model(project: dict, purpose_key: str, agent_context: str = "",
-                             model: str = "claude_sonnet_4_6", sample_blueprint: str = "") -> dict:
+                             model: str = "claude_sonnet_4_6", sample_blueprint: str = "",
+                             user_instructions: str = "") -> dict:
     """Return the parsed structured model dict. Raises ValueError on bad output."""
-    prompt = build_prompt(project, purpose_key, agent_context, sample_blueprint)
-    raw = invoke_llm(prompt, model=model)
+    prompt = build_prompt(project, purpose_key, agent_context, sample_blueprint,
+                          user_instructions)
+    # heavy=True: this is the ONE prompt that asks for the whole report at once (prose +
+    # KPIs + several sheets of JSON). On the cheap reasoning model that request consumes the
+    # entire 32 K output budget on reasoning and returns EMPTY content (finish_reason=length),
+    # which _extract_json raises "Empty model response" on -> 502 on every generation. The
+    # heavy model finishes its reasoning and writes the JSON. Cheap callers (cell-fill,
+    # agents) deliberately stay on the flash model.
+    raw = invoke_llm(prompt, model=model, heavy=True)
     data = _extract_json(raw)
 
     # Minimal shape guarantees so downstream builders never crash.

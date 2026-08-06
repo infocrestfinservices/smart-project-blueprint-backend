@@ -10,6 +10,8 @@ from routers.analysis_router import router as analysis_router
 from routers.auth_router import router as auth_router
 from routers.generation_router import router as generation_router
 from routers.templates_router import router as templates_router
+from routers.bank_loan_router import router as bank_loan_router
+from routers.engine_test_router import router as engine_test_router  # temporary: engine validation
 
 app = FastAPI(
     title="AI Feasibility Study & Project Report Generator",
@@ -39,6 +41,8 @@ app.include_router(analysis_router)
 app.include_router(auth_router)
 app.include_router(generation_router)
 app.include_router(templates_router)
+app.include_router(bank_loan_router)
+app.include_router(engine_test_router)  # temporary: engine validation, remove before prod
 
 
 @app.on_event("startup")

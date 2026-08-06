@@ -5,7 +5,7 @@ from database import get_db
 from models.project_model import Project
 from models.report_model import Report
 from models.user_model import User
-from schemas.project_schema import ProjectCreate, ProjectResponse
+from schemas.project_schema import ProjectCreate, ProjectResponse, ProjectUpdate
 from schemas.report_schema import ReportCreate, ReportResponse
 from dependencies import get_current_user, get_owned_project
 
@@ -36,6 +36,31 @@ def get_projects(
 
 @router.get("/{project_id}", response_model=ProjectResponse)
 def get_project(project: Project = Depends(get_owned_project)):
+    return project
+
+
+@router.patch("/{project_id}", response_model=ProjectResponse)
+def update_project(
+    data: ProjectUpdate,
+    project: Project = Depends(get_owned_project),
+    db: Session = Depends(get_db),
+):
+    """Edit a project's details. There was no update route at all, so "Edit Details" in
+    the report view saved nothing — the browser said "Field updated!" and the old value
+    came straight back on refresh.
+
+    Only fields present in the request body are written (`exclude_unset`), so editing one
+    figure leaves everything else exactly as it was. Ownership is enforced by
+    get_owned_project, the same dependency the other routes use; user_id and id are not
+    accepted from the body and so cannot be reassigned."""
+    changes = data.model_dump(exclude_unset=True)
+    # An omitted field means "leave alone"; an explicit null would otherwise wipe a value.
+    changes = {k: v for k, v in changes.items() if v is not None}
+    for field, value in changes.items():
+        setattr(project, field, value)
+    if changes:
+        db.commit()
+        db.refresh(project)
     return project
 
 @router.post("/{project_id}/report", response_model=ReportResponse)

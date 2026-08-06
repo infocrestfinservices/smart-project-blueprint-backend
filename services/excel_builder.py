@@ -1,13 +1,26 @@
 """
 excel_builder.py
 
-Turns the structured financial-model JSON into a professional, CA-style .xlsx
-workbook (openpyxl). Sheets are driven entirely by the AI output; a final
-Dashboard sheet renders native Excel charts defined in purpose_config.
-Returns the workbook as bytes.
+Two responsibilities live here:
+
+1. build_excel(model, purpose_key, project) -> bytes  [EXISTING, UNCHANGED]
+   Turns the structured financial-model JSON into a professional, CA-style .xlsx
+   workbook (openpyxl). Sheets are driven entirely by the AI output; a final
+   Dashboard sheet renders native Excel charts defined in purpose_config. Returns the
+   workbook as bytes. Used by routers/generation_router.
+
+2. build_excel_workbook(assumptions, template_path, output_path, template_definition)
+   -> dict  [ORCHESTRATION LAYER]
+   The final orchestration layer: builds one complete Excel workbook from a business
+   assumptions dict by passing outputs from one existing module into the next. It does
+   NO financial calculation, contains NO business logic, and uses openpyxl NOT at all
+   (all Excel work happens inside the write step's module). Its pipeline module imports
+   are done INSIDE the function so that importing this module for build_excel (the app
+   startup path via generation_router) has exactly the same import footprint as before.
 """
 
 import io
+import os
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side, NamedStyle
 from openpyxl.chart import BarChart, LineChart, PieChart, Reference
@@ -230,3 +243,72 @@ def build_excel(model: dict, purpose_key: str, project: dict) -> bytes:
     buf = io.BytesIO()
     wb.save(buf)
     return buf.getvalue()
+
+
+# ── ORCHESTRATION LAYER ─────────────────────────────────────────────────────────
+def build_excel_workbook(
+    assumptions: dict,
+    template_path: str,
+    output_path: str,
+    template_definition: dict,
+) -> dict:
+    """Build one complete Excel workbook from a business assumptions dict by
+    orchestrating existing modules only. Performs no calculation, no business logic,
+    and touches openpyxl only inside the write step's module.
+
+    Pipeline (outputs pass straight from one stage to the next):
+        1. run_financial_engine(assumptions)
+        2. build_financial_model(engine_output)
+        3. build_excel_mapping(financial_model)                 -> worksheet_mapping
+        4. build_template_cell_mapping(worksheet_mapping, template_definition)
+        5. write_excel_mapping(template_path, output_path, ...)
+
+    Returns {status, output_path, validation, metadata}. Raises ValueError for
+    malformed input (non-dict assumptions, missing workbook, non-dict template
+    definition); downstream module errors propagate unchanged.
+    """
+    fn = "build_excel_workbook"
+
+    # -- input validation (only these three; downstream validates the rest) --
+    if not isinstance(assumptions, dict):
+        raise ValueError(f"{fn}: assumptions must be a dict, got {type(assumptions).__name__}")
+    if not isinstance(template_path, str) or not os.path.isfile(template_path):
+        raise ValueError(f"{fn}: workbook does not exist: {template_path!r}")
+    if not isinstance(template_definition, dict):
+        raise ValueError(f"{fn}: template_definition must be a dict, "
+                         f"got {type(template_definition).__name__}")
+
+    # Pipeline module imports are done here (lazily) so that importing this module for
+    # build_excel keeps exactly its original, lighter import footprint.
+    from financial_engine.engine.financial_engine_runner import run_financial_engine
+    from financial_engine.models.financial_model_builder import build_financial_model
+    from excel_writer.financial_model_mapper import build_excel_mapping
+    from excel_writer.template_cell_mapper import build_template_cell_mapping
+    from excel_writer.excel_writer import write_excel_mapping
+
+    # -- pipeline (no calculation, no cell mapping here; just pass outputs along) --
+    engine_output = run_financial_engine(assumptions)
+    financial_model = build_financial_model(engine_output)
+    worksheet_mapping = build_excel_mapping(financial_model)
+    resolved_cell_mapping = build_template_cell_mapping(worksheet_mapping, template_definition)
+
+    # write_excel_mapping resolves field->cell from (worksheet_mapping, cell_mapping);
+    # step 4 already produced {sheet:{cell:value}}, so feed it through with a
+    # cell-identity map (each cell is both the value-key and its own A1 target).
+    identity_cell_map = {
+        sheet: {cell: cell for cell in cells}
+        for sheet, cells in resolved_cell_mapping.items()
+    }
+    write_excel_mapping(
+        workbook_path=template_path,
+        output_path=output_path,
+        worksheet_mapping=resolved_cell_mapping,
+        cell_mapping=identity_cell_map,
+    )
+
+    return {
+        "status": "success",
+        "output_path": output_path,
+        "validation": financial_model["validation"],
+        "metadata": financial_model["metadata"],
+    }

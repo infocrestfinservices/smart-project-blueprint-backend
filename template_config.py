@@ -46,8 +46,8 @@ TEMPLATES = {
             # Dashboard). Every sheet but the blue input cells is a live formula,
             # so filling the inputs recomputes the entire model in Excel.
             "id": "bank_loan_cma",
-            "label": "CMA Report — Bank Term Loan (Manufacturing)",
-            "file": "CMA_Report_Bank Loan_BLANK.xlsx",
+            "label": "CMA Report — Bank Term Loan (All Industries)",
+            "file": "CMA_Dashboard_Premium.xlsx",
             "currency": "INR",
             "engine": "template_fill",
             # Offered under every purpose, not just CMA.

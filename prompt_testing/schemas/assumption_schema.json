@@ -1,6 +1,16 @@
 {
   "_comment": "Field key -> Excel cell mapping for Assumptions sheet (CMA_Report_Template_MultiIndustry.xlsx). Keys are generic/fixed regardless of industry — only the *meaning* behind cost1/cost2 changes per industry (handled by the sheet's own label lookup, not by this agent).",
 
+  "_volume_price_fields": {
+    "units_sold_y1":             { "cell": "Assumptions!C16", "type": "number", "note": "e.g. covers served, room-nights sold, patients treated, students enrolled — Year 1 base value" },
+    "units_growth_index_y1_y5":  { "cell": "Assumptions!C18:G18", "type": "number_array", "length": 5, "note": "growth index, Year 1 = 1.00, e.g. [1.00, 1.10, 1.21, 1.33, 1.46]" },
+    "selling_price_y1":          { "cell": "Assumptions!C23", "type": "number", "note": "e.g. average order value, average room tariff, ARPU, fee per student" },
+    "selling_price_escalation":  { "cell": "Assumptions!C24", "type": "percent", "note": "annual" },
+    "gross_margin_pct":          { "cell": "Assumptions!C25", "type": "percent", "note": "cost of sales = revenue x (1 - margin)" },
+    "other_variable_cost_y1":    { "cell": "Assumptions!C29", "type": "number", "note": "packaging / fulfilment / misc variable cost per unit" },
+    "other_variable_escalation": { "cell": "Assumptions!C30", "type": "percent", "note": "annual" }
+  },
+
   "name_of_unit":              { "cell": "Assumptions!C5",  "type": "text",  "example": "Green Valley Agro Exports" },
   "constitution":              { "cell": "Assumptions!C6",  "type": "text",  "example": "Proprietorship" },
   "line_of_activity":          { "cell": "Assumptions!C7",  "type": "text",  "example": "Export of processed agricultural produce" },

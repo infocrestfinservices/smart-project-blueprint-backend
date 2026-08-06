@@ -1,0 +1,600 @@
+{
+  "template_id": "cma_food_beverage_restaurant_covers_served_average_order_value_898c85e2",
+  "file": "CMA_Restaurant.xlsx",
+  "currency": "INR",
+  "truncated": false,
+  "groups": [
+    {
+      "title": "Assumptions",
+      "sheet": "Assumptions",
+      "fields": [
+        {
+          "cell": "C5",
+          "label": "Name of the Unit",
+          "hint": "",
+          "default": null,
+          "type": "text"
+        },
+        {
+          "cell": "J5",
+          "label": "INDUSTRY / BUSINESS TYPE  →",
+          "hint": "",
+          "default": null,
+          "type": "enum",
+          "options": [
+            "Agriculture & Farming",
+            "Technology & Software",
+            "Retail & E-Commerce",
+            "Manufacturing",
+            "Tourism & Hospitality",
+            "Renewable Energy",
+            "Healthcare & Pharma",
+            "Education & Training",
+            "General Business",
+            "Construction & Real Estate",
+            "Food & Beverage / Restaurant",
+            "Transportation & Logistics",
+            "Textile & Garments",
+            "Automobile / Auto Ancillary",
+            "Import / Export Trading",
+            "Media & Entertainment",
+            "Mining & Minerals"
+          ]
+        },
+        {
+          "cell": "C6",
+          "label": "Constitution (Proprietor / Partnership / Pvt Ltd)",
+          "hint": "",
+          "default": null,
+          "type": "text"
+        },
+        {
+          "cell": "C7",
+          "label": "Line of Activity / Product",
+          "hint": "",
+          "default": null,
+          "type": "text"
+        },
+        {
+          "cell": "C8",
+          "label": "Term Loan applied for",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C9",
+          "label": "Promoters' Capital / Equity brought in",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C10",
+          "label": "Interest rate on Term Loan",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C11",
+          "label": "Term Loan tenure (in MONTHS, e.g. 60 for 5 years)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C12",
+          "label": "Moratorium / holiday period (in MONTHS)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C13",
+          "label": "Interest rate on Working Capital",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C14",
+          "label": "Income Tax rate",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C16",
+          "label": "Covers served (Year 1)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C18",
+          "label": "→ growth index Year 1…5 (Year 1 = 1.00) — Yr 1",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "D18",
+          "label": "→ growth index Year 1…5 (Year 1 = 1.00) — Yr 2",
+          "hint": "%",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "E18",
+          "label": "→ growth index Year 1…5 (Year 1 = 1.00) — Yr 3",
+          "hint": "%",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "F18",
+          "label": "→ growth index Year 1…5 (Year 1 = 1.00) — Yr 4",
+          "hint": "%",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "G18",
+          "label": "→ growth index Year 1…5 (Year 1 = 1.00) — Yr 5",
+          "hint": "%",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M1",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "D21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M2",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "E21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M3",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "F21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M4",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "G21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M5",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "H21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M6",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "I21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M7",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "J21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M8",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "K21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M9",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "L21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M10",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "M21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M11",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "N21",
+          "label": "→ weights (e.g. 1.0 each, or seasonal) — M12",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C23",
+          "label": "Average order value (Year 1)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C24",
+          "label": "annual price / value growth",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C25",
+          "label": "Gross margin on sales (%)  →  Food & beverage cost = Sales × (1 − margin)",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C26",
+          "label": "(cost of sales is margin-based, not per-unit)",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C27",
+          "label": "(not used in this industry)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C28",
+          "label": "annual power cost escalation",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C29",
+          "label": "Other cost per unit of activity (packaging / fulfilment)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C30",
+          "label": "annual other-variable escalation",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C32",
+          "label": "Direct wages & salaries / month (Year 1)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C33",
+          "label": "annual wages escalation",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C34",
+          "label": "Operating / facility overheads / month (Year 1)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C35",
+          "label": "annual factory-OH escalation",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C36",
+          "label": "Repairs & maintenance / month (Year 1)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C37",
+          "label": "annual R&M escalation",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C38",
+          "label": "Administrative expenses / month (Year 1)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C39",
+          "label": "annual admin escalation",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C40",
+          "label": "Selling & distribution",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C42",
+          "label": "Land (no depreciation)",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C43",
+          "label": "Building — cost",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C44",
+          "label": "Building — depreciation rate",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C45",
+          "label": "Plant & Machinery — cost",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C46",
+          "label": "Plant & Machinery — depreciation rate",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C47",
+          "label": "Furniture / other — cost",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C48",
+          "label": "Furniture / other — depreciation rate",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C50",
+          "label": "Raw material holding",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C51",
+          "label": "Finished goods holding",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C52",
+          "label": "Receivables / debtors",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C53",
+          "label": "Creditors / payables",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C54",
+          "label": "Minimum cash & bank balance",
+          "hint": "",
+          "default": null,
+          "type": "number"
+        },
+        {
+          "cell": "C55",
+          "label": "Bank's WC margin (borrower's stake)",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C58",
+          "label": "Segment 1 — Segment name",
+          "hint": "",
+          "default": null,
+          "type": "text"
+        },
+        {
+          "cell": "D58",
+          "label": "Segment 1 — Share of revenue",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C59",
+          "label": "Segment 2 — Segment name",
+          "hint": "",
+          "default": null,
+          "type": "text"
+        },
+        {
+          "cell": "D59",
+          "label": "Segment 2 — Share of revenue",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C60",
+          "label": "Segment 3 — Segment name",
+          "hint": "",
+          "default": null,
+          "type": "text"
+        },
+        {
+          "cell": "D60",
+          "label": "Segment 3 — Share of revenue",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C61",
+          "label": "Segment 4 — Segment name",
+          "hint": "",
+          "default": null,
+          "type": "text"
+        },
+        {
+          "cell": "D61",
+          "label": "Segment 4 — Share of revenue",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C62",
+          "label": "Segment 5 — Segment name",
+          "hint": "",
+          "default": null,
+          "type": "text"
+        },
+        {
+          "cell": "D62",
+          "label": "Segment 5 — Share of revenue",
+          "hint": "",
+          "default": null,
+          "type": "percent"
+        },
+        {
+          "cell": "C66",
+          "type": "number",
+          "default": null,
+          "label": "Beverages / Bar — annual volume / units (Year 1)",
+          "hint": "How many units of this stream are sold in Year 1. 0 only if the business genuinely has no such income."
+        },
+        {
+          "cell": "D66",
+          "type": "number",
+          "default": null,
+          "label": "Beverages / Bar — average price per unit",
+          "hint": "Revenue for this stream = volume x price."
+        },
+        {
+          "cell": "C67",
+          "type": "number",
+          "default": null,
+          "label": "Catering & Events — annual volume / units (Year 1)",
+          "hint": "How many units of this stream are sold in Year 1. 0 only if the business genuinely has no such income."
+        },
+        {
+          "cell": "D67",
+          "type": "number",
+          "default": null,
+          "label": "Catering & Events — average price per unit",
+          "hint": "Revenue for this stream = volume x price."
+        },
+        {
+          "cell": "C68",
+          "type": "number",
+          "default": null,
+          "label": "Home delivery / Takeaway — annual volume / units (Year 1)",
+          "hint": "How many units of this stream are sold in Year 1. 0 only if the business genuinely has no such income."
+        },
+        {
+          "cell": "D68",
+          "type": "number",
+          "default": null,
+          "label": "Home delivery / Takeaway — average price per unit",
+          "hint": "Revenue for this stream = volume x price."
+        },
+        {
+          "cell": "C69",
+          "type": "number",
+          "default": null,
+          "label": "Other revenue — annual volume / units (Year 1)",
+          "hint": "How many units of this stream are sold in Year 1. 0 only if the business genuinely has no such income."
+        },
+        {
+          "cell": "D69",
+          "type": "number",
+          "default": null,
+          "label": "Other revenue — average price per unit",
+          "hint": "Revenue for this stream = volume x price."
+        },
+        {
+          "cell": "C72",
+          "type": "number",
+          "default": 0,
+          "label": "Existing loan — treatment (1 = take-over by the new loan, 2 = additional, keeps running)",
+          "hint": "Leave 0 if the borrower has no running loan. 2 is the safe default."
+        },
+        {
+          "cell": "C73",
+          "type": "number",
+          "default": 0,
+          "label": "Existing loan — outstanding today (₹)",
+          "hint": "Principal still owed on any loan the borrower already has. 0 if none."
+        },
+        {
+          "cell": "C74",
+          "type": "percent",
+          "default": 0,
+          "label": "Existing loan — interest rate (% p.a.)",
+          "hint": "As a fraction, e.g. 0.13 for 13%."
+        },
+        {
+          "cell": "C75",
+          "type": "number",
+          "default": 0,
+          "label": "Existing loan — remaining tenure (MONTHS)",
+          "hint": "Months still to run, e.g. 48. Not years."
+        }
+      ]
+    }
+  ]
+}

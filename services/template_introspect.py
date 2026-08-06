@@ -21,6 +21,7 @@ Run as a script to (re)generate raw schemas for every template_fill template:
 
 import json
 import os
+import re
 
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
@@ -44,6 +45,10 @@ def _is_input_sheet(name: str) -> bool:
 
 def _infer_type(cell) -> str:
     fmt = (cell.number_format or "").lower()
+    # "@" is Excel's Text format: the one signal that survives a BLANK template and
+    # marks a cell as free text rather than a number.
+    if fmt.strip() == "@":
+        return "text"
     if "%" in fmt:
         return "percent"
     if "yyyy" in fmt or "mmm" in fmt or "dd" in fmt:
@@ -51,18 +56,35 @@ def _infer_type(cell) -> str:
     return "number"
 
 
+def _label_text(v) -> str:
+    """Readable label text for a cell value. Labels are increasingly formula-driven
+    (e.g. =IFERROR(VLOOKUP($J$5,INDUSTRY_MAP,2,FALSE()),"Installed Capacity")); the
+    IFERROR fallback literal is that label's industry-neutral default, so use it
+    instead of skipping the cell and drifting up to a section heading."""
+    if not isinstance(v, str) or len(v.strip()) <= 1:
+        return ""
+    if v.startswith("="):
+        lits = re.findall(r'"([^"]{2,})"', v)
+        return lits[-1].strip() if lits else ""
+    return v.strip()
+
+
 def _row_label(ws, row: int, value_col: int) -> str:
-    """First text cell to the LEFT of the value on this row; fall back to the
-    nearest text label above in column A/B."""
-    for c in range(1, value_col):
-        v = ws.cell(row=row, column=c).value
-        if isinstance(v, str) and len(v.strip()) > 1 and not v.startswith("="):
-            return v.strip()
+    """Nearest text cell to the LEFT of the value on this row; fall back to the
+    nearest text label above in column A/B.
+
+    Nearest-first (not left-most-first): a row can carry several label/value pairs
+    (e.g. "Name of the Unit | C5 … INDUSTRY / BUSINESS TYPE → | J5"), and scanning
+    from column A would label every value on the row with the first one."""
+    for c in range(value_col - 1, 0, -1):
+        label = _label_text(ws.cell(row=row, column=c).value)
+        if label:
+            return label
     for r in range(row - 1, max(row - 6, 0), -1):
         for c in (1, 2):
-            v = ws.cell(row=r, column=c).value
-            if isinstance(v, str) and len(v.strip()) > 1 and not v.startswith("="):
-                return v.strip()
+            label = _label_text(ws.cell(row=r, column=c).value)
+            if label:
+                return label
     return ""
 
 
@@ -115,6 +137,64 @@ def _context_right(ws, row: int, col: int, span: int = 4) -> str:
     return " · ".join(out)[:120]
 
 
+def _resolve_list(ws, formula1) -> list:
+    """Options behind a list data-validation: either an inline "a,b,c" list or a
+    range reference (e.g. =$S$5:$S$40) resolved against the workbook."""
+    f = str(formula1 or "").strip()
+    if not f:
+        return []
+    if f.startswith('"') and f.endswith('"'):
+        return [x.strip() for x in f.strip('"').split(",") if x.strip()]
+    ref = f.lstrip("=")
+    sheet = ws
+    if "!" in ref:
+        sname, ref = ref.split("!", 1)
+        sname = sname.strip("'")
+        if sname not in ws.parent.sheetnames:
+            return []
+        sheet = ws.parent[sname]
+    try:
+        cells = sheet[ref.replace("$", "")]
+    except Exception:
+        return []
+    if not isinstance(cells, tuple):
+        cells = ((cells,),)
+    out = []
+    for row in cells:
+        for c in (row if isinstance(row, tuple) else (row,)):
+            v = c.value
+            if isinstance(v, str) and v.strip() and not v.startswith("="):
+                out.append(v.strip())
+    return out
+
+
+def _validation_options(ws) -> dict:
+    """{coordinate: [allowed values]} for every list-validated (dropdown) cell.
+
+    A dropdown is the designer stating that the cell is a CHOICE from a fixed set,
+    not free input. Carrying that into the schema lets the AI pick a value the
+    template's lookups actually resolve, rather than inventing a near-miss string."""
+    out = {}
+    try:
+        dvs = list(ws.data_validations.dataValidation)
+    except Exception:
+        return out
+    for dv in dvs:
+        if dv.type != "list":
+            continue
+        opts = _resolve_list(ws, dv.formula1)
+        if not opts:
+            continue
+        try:
+            for rng in dv.sqref.ranges:
+                for row in range(rng.min_row, rng.max_row + 1):
+                    for col in range(rng.min_col, rng.max_col + 1):
+                        out[f"{get_column_letter(col)}{row}"] = opts
+        except Exception:
+            continue
+    return out
+
+
 def _extract_blue_schema(wb, template_id: str, currency: str, path: str) -> dict:
     """Schema from colour-coded (blue-font) input cells across ALL sheets. Works on
     a blank template because it keys off styling, not on cells already holding
@@ -132,6 +212,7 @@ def _extract_blue_schema(wb, template_id: str, currency: str, path: str) -> dict
             continue
         base = {c.coordinate: (_row_label(ws, c.row, c.column) or ws.title) for c in blue}
         dupes = Counter(base.values())
+        options = _validation_options(ws)
         fields = []
         for cell in blue:
             if field_count >= _MAX_FIELDS:
@@ -140,13 +221,17 @@ def _extract_blue_schema(wb, template_id: str, currency: str, path: str) -> dict
             if dupes[label] > 1:
                 hdr = _column_header(ws, cell.row, cell.column)
                 label = f"{label} — {hdr}" if hdr else f"{label} ({cell.coordinate})"
-            fields.append({
+            choices = options.get(cell.coordinate)
+            field = {
                 "cell": cell.coordinate,
                 "label": label[:80],
                 "hint": _context_right(ws, cell.row, cell.column),
                 "default": None if isinstance(cell.value, str) else cell.value,
-                "type": _infer_type_blue(cell),
-            })
+                "type": "enum" if choices else _infer_type_blue(cell),
+            }
+            if choices:
+                field["options"] = choices
+            fields.append(field)
             field_count += 1
         if fields:
             groups.append({"title": ws.title, "sheet": ws.title, "fields": fields})

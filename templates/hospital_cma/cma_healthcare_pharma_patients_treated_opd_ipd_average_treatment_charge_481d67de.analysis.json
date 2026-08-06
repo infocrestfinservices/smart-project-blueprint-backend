@@ -1,0 +1,76 @@
+{
+  "kpis": [
+    {
+      "label": "Current Ratio",
+      "metric": "Current Ratio",
+      "sheet": "Dashboard",
+      "cell": "C73",
+      "type": "ratio_x"
+    },
+    {
+      "label": "Debt–Equity",
+      "metric": "Debt–Equity",
+      "sheet": "Dashboard",
+      "cell": "C74",
+      "type": "ratio_x"
+    },
+    {
+      "label": "EBITDA Margin",
+      "metric": "EBITDA Margin",
+      "sheet": "Dashboard",
+      "cell": "C77",
+      "type": "percent"
+    },
+    {
+      "label": "Net Profit Margin",
+      "metric": "Net Profit Margin",
+      "sheet": "Dashboard",
+      "cell": "C78",
+      "type": "percent"
+    },
+    {
+      "label": "Break-even",
+      "metric": "Break-even",
+      "sheet": "Dashboard",
+      "cell": "G82",
+      "type": "percent"
+    },
+    {
+      "label": "TOL / TNW (Yr 5)",
+      "metric": "TOL / TNW",
+      "sheet": "Ratios",
+      "cell": "G8",
+      "type": "ratio_x"
+    },
+    {
+      "label": "ROCE (Yr 5)",
+      "metric": "ROCE",
+      "sheet": "Ratios",
+      "cell": "G12",
+      "type": "percent"
+    },
+    {
+      "label": "Interest Coverage (Yr 5)",
+      "metric": "Interest Coverage",
+      "sheet": "Ratios",
+      "cell": "G14",
+      "type": "ratio_x"
+    },
+    {
+      "label": "DSCR (Yr 5)",
+      "metric": "DSCR",
+      "sheet": "Ratios",
+      "cell": "G15",
+      "type": "ratio_x"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Check (Liabilities − Assets = 0)",
+      "sheet": "Form_III_BalanceSheet",
+      "cell": "C22",
+      "tolerance": 1.0,
+      "expect": 0.0
+    }
+  ]
+}

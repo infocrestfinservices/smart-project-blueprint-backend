@@ -17,6 +17,7 @@ IRR = "irr_analysis"
 IMMIGRATION = "immigration_business_plan"
 REAL_ESTATE = "real_estate"
 STARTUP = "startup_sme_fundraising"
+GRANT = "government_grant"
 GENERIC = "generic"
 
 
@@ -38,6 +39,11 @@ def resolve_purpose(purpose: str = None, financial_format: str = None) -> str:
         return STARTUP
     if "cma" in p or "cma" in f:
         return CMA
+    # Government schemes / subsidies read as a GRANT appraisal, not a bank loan:
+    # the assessor cares about eligibility, employment and social impact.
+    if "grant" in p or "subsidy" in p or "scheme" in p or p in (
+            "pmegp", "mudra", "cgtmse", "startup_india", "msme"):
+        return GRANT
     if p in ("feasibility_study", "feasibility", "internal_planning"):
         return FEASIBILITY
     # Startup investment purposes generate the fundraising financial model.
@@ -103,6 +109,18 @@ PURPOSES = {
         "label": "CMA Data",
         "questions": [
             {"key": "loan_amount", "label": "Term Loan Amount Requested", "type": "number", "hint": "Bank loan sought"},
+            # Prior debt. Asked as five plain questions rather than one number, because
+            # the TREATMENT changes the model: a take-over is cleared by the new facility
+            # and leaves the balance sheet, whereas an additional loan keeps costing
+            # interest and stays in the debt-service cover. Answer "No" to the first and
+            # the report is built without the Existing Loan sheet at all.
+            {"key": "has_existing_loan", "label": "Is any loan already running?", "type": "text",
+             "hint": "Yes or No. Say No and the report is built without any existing-loan section."},
+            {"key": "existing_loan_treatment", "label": "If yes — take it over, or keep it running?", "type": "text",
+             "hint": "'Take-over' = the new loan clears it.  'Additional' = it continues alongside."},
+            {"key": "existing_loan_outstanding", "label": "Existing loan — amount still outstanding", "type": "number", "hint": "Principal still owed today"},
+            {"key": "existing_loan_rate", "label": "Existing loan — interest rate (%)", "type": "number", "hint": "e.g. 13 for 13% per annum"},
+            {"key": "existing_loan_tenure_months", "label": "Existing loan — months still to run", "type": "number", "hint": "e.g. 36. Months, not years."},
             {"key": "existing_borrowings", "label": "Existing Borrowings", "type": "number", "hint": "Current outstanding loans"},
             {"key": "working_capital_requirement", "label": "Working Capital Requirement", "type": "number", "hint": "Estimated WC need"},
             {"key": "current_assets", "label": "Current Assets", "type": "number", "hint": "Inventory + debtors + cash + other CA"},
@@ -253,6 +271,47 @@ PURPOSES = {
             {"title": "Financial Projections", "guidance": "Revenue build-up, unit economics, cost structure and path to profitability. Figures are in the Excel model."},
             {"title": "Funding Ask & Use of Funds", "guidance": "Amount raised, instrument, valuation, and how the capital is deployed."},
             {"title": "Investor Returns & Exit", "guidance": "Return scenarios and potential exit paths."},
+        ],
+        "excel_sheets": [],
+        "charts": [],
+    },
+
+    # A government-scheme appraisal is judged on eligibility, employment created,
+    # innovation and social impact — not on a bank's repayment lens. Its sections
+    # deliberately differ from the CMA/bank-loan report.
+    GRANT: {
+        "label": "Government Grant / Scheme Application",
+        "questions": [
+            {"key": "government_scheme_name", "label": "Scheme applied under", "type": "text",
+             "hint": "e.g. PMEGP, Mudra, CGTMSE, Startup India, state policy"},
+            {"key": "project_cost", "label": "Total Project Cost", "type": "number",
+             "hint": "Total capital required"},
+            {"key": "own_contribution", "label": "Promoter's Own Contribution", "type": "number",
+             "hint": "Margin money the promoter brings in"},
+            {"key": "grant_amount", "label": "Grant / Subsidy Sought", "type": "number",
+             "hint": "Assistance applied for under the scheme"},
+            {"key": "employment_generated", "label": "Employment Generated", "type": "number",
+             "hint": "Direct jobs created (persons)"},
+        ],
+        "word_sections": [
+            {"title": "Executive Summary",
+             "guidance": "The proposal in brief: promoter, activity, project cost, assistance sought under the scheme, and the headline benefit to the local economy."},
+            {"title": "Promoter & Enterprise Profile",
+             "guidance": "Promoter background, category/eligibility credentials, constitution, location and the enterprise's activity."},
+            {"title": "Scheme Eligibility & Compliance",
+             "guidance": "How the proposal meets the named scheme's criteria — investment ceiling, category, activity eligibility, margin-money norms and any prior assistance availed."},
+            {"title": "Project Cost & Means of Finance",
+             "guidance": "Item-wise cost of project, promoter contribution, grant/subsidy component and term loan, showing sources equal uses."},
+            {"title": "Employment Generation & Social Impact",
+             "guidance": "Direct and indirect employment created, skill profile, women/SC-ST/rural participation, and the wider social benefit the scheme intends."},
+            {"title": "Innovation, Technology & Sustainability",
+             "guidance": "Technology adopted, innovation content, energy/environment considerations and long-term sustainability of the unit."},
+            {"title": "Financial Viability",
+             "guidance": "Profitability, break-even and the unit's ability to sustain itself after the assistance. Detailed figures are in the Excel model."},
+            {"title": "Utilisation of Assistance & Monitoring",
+             "guidance": "How the grant will be deployed, phasing, and how utilisation will be documented and monitored."},
+            {"title": "Conclusion & Recommendation",
+             "guidance": "Why the proposal deserves sanction under the scheme, with the key eligibility and impact points restated."},
         ],
         "excel_sheets": [],
         "charts": [],

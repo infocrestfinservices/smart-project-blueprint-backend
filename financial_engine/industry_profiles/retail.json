@@ -1,0 +1,349 @@
+{
+  "industry": "retail",
+  "display_name": "Retail & E-Commerce",
+  "revenue_model": "Revenue is driven by gross merchandise value (GMV) from selling finished goods to end consumers, measured in units sold × average selling price (ASP), with no production or conversion of raw materials.",
+  "notes": [
+    "Retail & E-Commerce does not manufacture goods; it procures finished goods from suppliers and sells them, so installed capacity, capacity utilisation, raw-material holding, and finished-goods holding (as a production metric) are meaningless.",
+    "Cost of goods sold (COGS) is the purchase price of inventory, not per-unit conversion costs; there are no cost1/cost2 per unit in a manufacturing sense.",
+    "Fixed assets are primarily warehouses, IT infrastructure, and leasehold improvements; plant & machinery is rare unless the business owns packaging or fulfilment automation equipment.",
+    "Working capital is dominated by inventory holding (days of stock cover) and payment cycles with suppliers and payment gateways, not raw-material or finished-goods holding days from a factory perspective."
+  ],
+  "fields": {
+    "term_loan_amount": {
+      "applies": true,
+      "label": "Term Loan Amount (INR)",
+      "band": [
+        5000000,
+        500000000
+      ],
+      "default": 50000000,
+      "rationale": "Retail & E-Commerce businesses borrow for warehouse setup, technology, and expansion; amounts vary widely by scale."
+    },
+    "promoters_capital": {
+      "applies": true,
+      "label": "Promoters' Capital / Equity (INR)",
+      "band": [
+        1000000,
+        100000000
+      ],
+      "default": 10000000,
+      "rationale": "Minimum promoter contribution typically 20-25% of project cost as per RBI norms for retail trade."
+    },
+    "interest_rate_term_loan": {
+      "applies": true,
+      "label": "Term Loan Interest Rate (p.a.)",
+      "band": [
+        0.09,
+        0.14
+      ],
+      "default": 0.115,
+      "rationale": "Banks charge 9-14% for retail trade term loans depending on credit profile and collateral."
+    },
+    "term_loan_tenure_months": {
+      "applies": true,
+      "label": "Term Loan Tenure (months)",
+      "band": [
+        36,
+        84
+      ],
+      "default": 60,
+      "rationale": "Typical tenure for retail term loans is 3-7 years, with 5 years being common."
+    },
+    "moratorium_months": {
+      "applies": true,
+      "label": "Moratorium / Grace Period (months)",
+      "band": [
+        0,
+        6
+      ],
+      "default": 3,
+      "rationale": "Moratorium of 0-6 months is allowed for retail projects before principal repayment begins."
+    },
+    "interest_rate_wc": {
+      "applies": true,
+      "label": "Working Capital Interest Rate (p.a.)",
+      "band": [
+        0.1,
+        0.15
+      ],
+      "default": 0.125,
+      "rationale": "Working capital loans for retail carry 10-15% interest, often linked to MCLR plus spread."
+    },
+    "income_tax_rate": {
+      "applies": true,
+      "label": "Effective Income Tax Rate (corporate)",
+      "band": [
+        0.25,
+        0.3
+      ],
+      "default": 0.27,
+      "rationale": "Indian companies pay 25-30% effective tax including surcharge and cess; retail businesses usually opt for lower rate if eligible."
+    },
+    "installed_capacity": {
+      "applies": false,
+      "rationale": "Retail & E-Commerce has no installed capacity in a manufacturing sense; there are no production machines or production lines."
+    },
+    "capacity_utilisation_y1_y5": {
+      "applies": false,
+      "rationale": "Capacity utilisation is a factory concept; retail businesses measure store footfall or website traffic, not machine utilisation."
+    },
+    "monthly_seasonality_weights": {
+      "applies": true,
+      "label": "Monthly Seasonality Weights (sales multiplier)",
+      "band": [
+        0.6,
+        1.8
+      ],
+      "default": 1.0,
+      "rationale": "Retail sales are highly seasonal — festive months (Diwali, wedding season) peak 1.5-1.8x, lean months (Feb, March) dip to 0.6-0.8x."
+    },
+    "selling_price_y1": {
+      "applies": true,
+      "label": "Average Selling Price (ASP) per unit (INR)",
+      "band": [
+        100,
+        10000
+      ],
+      "default": 500,
+      "rationale": "ASP varies hugely by category; grocery items ~100-500 INR, electronics/apparel 1000-10000 INR."
+    },
+    "selling_price_escalation": {
+      "applies": true,
+      "label": "Annual ASP Escalation (%)",
+      "band": [
+        0.02,
+        0.06
+      ],
+      "default": 0.04,
+      "rationale": "ASP escalation tracks inflation and brand premium; typically 2-6% p.a. for retail, not cost-driven escalation."
+    },
+    "cost1_per_unit_y1": {
+      "applies": false,
+      "rationale": "Cost1 per unit implies a direct material cost in production; retail COGS is the purchase price of finished goods, not a per-unit conversion cost."
+    },
+    "cost1_escalation": {
+      "applies": false,
+      "rationale": "No cost1 exists; inventory purchase price escalation is captured in gross margin compression, not a separate cost line."
+    },
+    "cost2_per_unit_y1": {
+      "applies": false,
+      "rationale": "Cost2 per unit (e.g., labour or overhead per unit) is meaningless in retail where costs are period costs, not unit-linked."
+    },
+    "cost2_escalation": {
+      "applies": false,
+      "rationale": "No cost2 per unit to escalate; retail overheads are period costs, not variable per unit of sale."
+    },
+    "other_variable_cost_y1": {
+      "applies": true,
+      "label": "Other Variable Costs (e.g., payment gateway, packaging) per unit (INR)",
+      "band": [
+        2,
+        50
+      ],
+      "default": 10,
+      "rationale": "E-Commerce includes payment gateway fees (~2% of GMV), packaging costs (5-20 INR/unit), and delivery charges (if not passed to customer)."
+    },
+    "other_variable_escalation": {
+      "applies": true,
+      "label": "Other Variable Cost Escalation (%)",
+      "band": [
+        0.03,
+        0.07
+      ],
+      "default": 0.05,
+      "rationale": "These costs escalate with inflation and logistics cost increases; typically 3-7% p.a."
+    },
+    "wages_monthly_y1": {
+      "applies": true,
+      "label": "Total Employee Cost (monthly, INR)",
+      "band": [
+        50000,
+        5000000
+      ],
+      "default": 500000,
+      "rationale": "Includes store staff, warehouse workers, and corporate team; ranges from small store (~50K) to large e-commerce (~50L monthly)."
+    },
+    "wages_escalation": {
+      "applies": true,
+      "label": "Employee Cost Escalation (%)",
+      "band": [
+        0.05,
+        0.1
+      ],
+      "default": 0.08,
+      "rationale": "Wages in retail grow 5-10% p.a. due to inflation, minimum wage hikes, and attrition."
+    },
+    "factory_overheads_monthly_y1": {
+      "applies": false,
+      "rationale": "Factory overheads do not exist in retail; the equivalent is warehouse/fulfilment centre overheads, captured under admin or selling expenses."
+    },
+    "factory_oh_escalation": {
+      "applies": false,
+      "rationale": "No factory overhead to escalate; warehouse costs are part of selling & distribution or admin."
+    },
+    "repairs_maintenance_monthly_y1": {
+      "applies": true,
+      "label": "Repairs & Maintenance (monthly, INR)",
+      "band": [
+        5000,
+        500000
+      ],
+      "default": 50000,
+      "rationale": "Covers store/warehouse upkeep, IT hardware, and fixtures; typically 0.5-2% of fixed asset value annually."
+    },
+    "rm_escalation": {
+      "applies": true,
+      "label": "Repairs & Maintenance Escalation (%)",
+      "band": [
+        0.03,
+        0.06
+      ],
+      "default": 0.05,
+      "rationale": "R&M costs escalate with inflation and asset age; 3-6% p.a. is typical."
+    },
+    "admin_expenses_monthly_y1": {
+      "applies": true,
+      "label": "Administrative & General Expenses (monthly, INR)",
+      "band": [
+        20000,
+        2000000
+      ],
+      "default": 200000,
+      "rationale": "Includes rent (if not separate), utilities, office supplies, professional fees; varies with scale."
+    },
+    "admin_escalation": {
+      "applies": true,
+      "label": "Admin Expense Escalation (%)",
+      "band": [
+        0.04,
+        0.08
+      ],
+      "default": 0.06,
+      "rationale": "Admin expenses grow with inflation and business expansion; 4-8% p.a. is common."
+    },
+    "selling_distribution": {
+      "applies": true,
+      "label": "Selling & Distribution Expenses (% of sales)",
+      "band": [
+        0.02,
+        0.1
+      ],
+      "default": 0.05,
+      "rationale": "Includes marketing, logistics, and fulfilment; 2-10% of GMV for retail, higher for e-commerce (5-10%)."
+    },
+    "land_cost": {
+      "applies": true,
+      "label": "Land Cost (INR)",
+      "band": [
+        0,
+        50000000
+      ],
+      "default": 0,
+      "rationale": "Many retail businesses lease premises; land cost is zero for leased operations, but can be significant for owned stores/warehouses."
+    },
+    "building_cost": {
+      "applies": true,
+      "label": "Building / Warehouse / Store Construction Cost (INR)",
+      "band": [
+        0,
+        200000000
+      ],
+      "default": 5000000,
+      "rationale": "Cost of constructing or fitting out a retail store or warehouse; ranges from 50L for small store to 20Cr for large fulfilment centre."
+    },
+    "building_dep_rate": {
+      "applies": true,
+      "label": "Building Depreciation Rate (%)",
+      "band": [
+        0.05,
+        0.1
+      ],
+      "default": 0.1,
+      "rationale": "Buildings depreciate at 5-10% p.a. under WDV as per Companies Act; retail warehouses use 10%."
+    },
+    "plant_machinery_cost": {
+      "applies": false,
+      "rationale": "Retail & E-Commerce rarely owns plant & machinery; equipment like conveyors or sorters in fulfilment centres is classified as furniture or IT assets."
+    },
+    "plant_machinery_dep_rate": {
+      "applies": false,
+      "rationale": "No plant & machinery to depreciate; if automation exists, it is depreciated under furniture or IT at 15-20%."
+    },
+    "furniture_other_cost": {
+      "applies": true,
+      "label": "Furniture, Fixtures, IT & Equipment Cost (INR)",
+      "band": [
+        100000,
+        10000000
+      ],
+      "default": 2000000,
+      "rationale": "Includes store shelving, POS systems, computers, servers; typically 2-10 lakh per store, higher for e-commerce tech stack."
+    },
+    "furniture_dep_rate": {
+      "applies": true,
+      "label": "Furniture & IT Depreciation Rate (%)",
+      "band": [
+        0.1,
+        0.2
+      ],
+      "default": 0.15,
+      "rationale": "Furniture depreciates at 10-15%, IT equipment at 15-20% p.a. under WDV."
+    },
+    "raw_material_holding_days": {
+      "applies": false,
+      "rationale": "Retail does not hold raw materials; it holds finished goods inventory purchased from suppliers."
+    },
+    "finished_goods_holding_days": {
+      "applies": false,
+      "rationale": "This field is meant for manufacturing finished goods; retail holds inventory (stock cover) measured in days of sales, not days of production."
+    },
+    "receivables_days": {
+      "applies": true,
+      "label": "Receivables / Debtor Days (days)",
+      "band": [
+        0,
+        15
+      ],
+      "default": 3,
+      "rationale": "Retail sales are mostly cash or card; e-commerce receives payment in 1-7 days from payment gateways; B2B retail can have 15 days. Very low vs manufacturing."
+    },
+    "payables_days": {
+      "applies": true,
+      "label": "Payables / Creditor Days (days)",
+      "band": [
+        15,
+        60
+      ],
+      "default": 30,
+      "rationale": "Retailers get 15-60 days credit from suppliers, with 30 days being typical for fast-moving goods."
+    },
+    "min_cash_balance": {
+      "applies": true,
+      "label": "Minimum Cash / Bank Balance (INR)",
+      "band": [
+        50000,
+        5000000
+      ],
+      "default": 500000,
+      "rationale": "Retail needs cash for daily operations, petty cash, and unforeseen expenses; 5-10% of monthly sales is common."
+    },
+    "wc_margin_pct": {
+      "applies": true,
+      "label": "Working Capital Margin / Promoter Contribution (%)",
+      "band": [
+        0.2,
+        0.25
+      ],
+      "default": 0.25,
+      "rationale": "Banks require 20-25% margin on working capital limit as per RBI guidelines for retail trade."
+    }
+  },
+  "authored_by": "deepseek-chat",
+  "frozen_at": "2026-07-17",
+  "_coverage": {
+    "described": 40,
+    "of": 40,
+    "unknown_dropped": [],
+    "not_described": []
+  }
+}
