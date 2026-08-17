@@ -32,6 +32,17 @@ class Settings(BaseSettings):
     # Setting the conventional OPENAI_API_KEY is enough on its own: it implies OpenAI's
     # endpoint and OPENAI_MODEL (default gpt-4.1). The HEAVY_* trio still wins if given,
     # so any other provider can be pointed at without touching this.
+    # The cell-fill is the ONE call whose output every figure in both deliverables is built
+    # on, and it is by far the slowest step (measured: ~343 s on v4-flash against ~12 s on
+    # gpt-4.1 for the same 81-field prompt — the cheap model is not wrong, it is slow).
+    # Set CELLFILL_HEAVY=true in .env to run it on the heavy model instead. Off by default,
+    # so this is a one-line switch in either direction with no code change.
+    CELLFILL_HEAVY: bool = False
+    # The AGENTS stay on the cheap model — deliberately, and not for want of a faster one.
+    # Measured: 223 s against 28.5 s on the heavy model for the same market-research prompt,
+    # so moving them would cut a generation from ~5 minutes to ~1.5. But the cheap model
+    # writes MORE (15,798 characters against 8,144 for that prompt), and the client's call
+    # was quality over speed. Do not add a switch for this without asking them again.
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4.1"
     # Cover artwork generated per project. Falls back to dall-e-3, then to the bundled
@@ -65,6 +76,49 @@ class Settings(BaseSettings):
         """True when the narrative runs somewhere other than the default DeepSeek client."""
         return bool(self.HEAVY_API_KEY.strip() or self.HEAVY_BASE_URL.strip()
                     or self.HEAVY_MODEL.strip() or self.OPENAI_API_KEY.strip())
+    # Razorpay. The KEY_ID is public (the browser needs it to open the checkout); the
+    # SECRET never leaves the server — it is what proves a payment actually happened.
+    # Which deployment this is. Anything other than "production" is treated as a place
+    # where it is safe to expose the engine-test harness and the interactive API docs.
+    # It defaults to development so a machine with no ENV set behaves as a dev box —
+    # a production server is the one that has to say so, and saying so is one line.
+    ENV: str = "development"
+
+    # ── who the invoice is FROM ────────────────────────────────────────────────
+    # Read from the environment rather than written into the code, because these are legal
+    # details on a document a customer keeps: they change without the software changing, and
+    # the person who knows them is not the person editing Python.
+    COMPANY_NAME: str = "ReportCraft AI"
+    COMPANY_ADDRESS: str = ""
+    COMPANY_EMAIL: str = "support@infocrest.in"
+    COMPANY_STATE: str = ""
+    # Empty = NOT registered for GST. That is not a cosmetic difference: an unregistered
+    # business must not charge GST and must not issue a "Tax Invoice" — it issues a Bill of
+    # Supply carrying a statement that it is not registered. Setting a GSTIN here is the
+    # single switch that turns the document into a tax invoice with a tax breakup.
+    COMPANY_GSTIN: str = ""
+    GST_RATE: float = 0.18
+    # Services accounting code. 998314 covers IT design and development services, which is
+    # what a generated financial report is. Only appears once a GSTIN exists.
+    SAC_CODE: str = "998314"
+    # Browser credentials for /docs in production. Empty means the docs do not exist there
+    # at all, which is the safe default: an API reference that lists every endpoint and
+    # every field is a map of the attack surface, and it is only useful to staff.
+    DOCS_USER: str = "admin"
+    DOCS_PASSWORD: str = ""
+
+    RAZORPAY_KEY_ID: str = ""
+    RAZORPAY_KEY_SECRET: str = ""
+    # Set in the Razorpay dashboard when the webhook URL is registered. It is NOT the key
+    # secret — a different value, and the only thing that distinguishes a real delivery from
+    # anyone on the internet posting "subscription.charged". Empty means every webhook is
+    # rejected, which is the correct behaviour for a server that cannot tell them apart.
+    RAZORPAY_WEBHOOK_SECRET: str = ""
+
+    @property
+    def payments_enabled(self) -> bool:
+        return bool(self.RAZORPAY_KEY_ID.strip() and self.RAZORPAY_KEY_SECRET.strip())
+
     SECRET_KEY: str = "changeme"
     RESEND_API_KEY: str = ""
     FROM_EMAIL: str = "onboarding@resend.dev"

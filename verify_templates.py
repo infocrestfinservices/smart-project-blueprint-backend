@@ -180,6 +180,64 @@ def _(folder, path, wb):
     return f"charts point at {sorted(bad)}" if bad else None
 
 
+# ── model-level invariants (per operating model, not per workbook) ─────────────
+# Every workbook check above is per template folder. This one is per INDUSTRY, and it
+# exists because of a fault the folder checks could never have caught: the streams block
+# was structurally perfect in every template, while six industries had no stream profile
+# to fill it with, so their reports shipped with the block at zero. The template was fine;
+# the data behind it was missing. Agriculture, textile, automobile, mining, renewable
+# energy and construction were left at (0,0,0,0) when the capacity workbook had no streams
+# section, and nobody went back when it grew one. A new industry added tomorrow would fall
+# into exactly the same hole silently, so it is asserted here instead of remembered.
+def _model_invariants() -> list[str]:
+    from financial_engine.industry_calc.operating_models import _MODELS
+    problems = []
+    for key, m in _MODELS.items():
+        if not any(m.stream_mix):
+            problems.append(f"{key}: stream_mix is all zero — its reports ship an empty "
+                            f"revenue-streams block")
+        elif not any(m.stream_vol_per_core):
+            problems.append(f"{key}: has a stream_mix but no stream_vol_per_core — the "
+                            f"guard needs both and stands down without it")
+        if m.margin_hint and not (0 < m.margin_hint[0] < m.margin_hint[1] < 1):
+            problems.append(f"{key}: margin_hint {m.margin_hint} is not a sane band")
+    return problems
+
+
+def _chain_order_invariant() -> list[str]:
+    """Assumptions!C18 is read by two guards with two meanings — year-1 capacity
+    UTILISATION in reconcile_scale, which divides by it, and the year-1 growth INDEX in
+    reconcile_working_capital, which resets it to 1.0. Order decides which is left stale.
+    With scale first, a 25% ramp in that cell quadrupled the solar plant's output and the
+    reset that followed never went back to it: a 5.76 MW generation on a 2.12 MW capex,
+    shipped. This drives a real project through the chain and fails if the volume comes out
+    divided by C18 again, so a reorder cannot quietly reintroduce it.
+    """
+    from database import SessionLocal
+    from models.project_model import Project
+    from routers.generation_router import (_stored_answers, _resolve_template,
+                                           resolve_purpose, _reconcile_all)
+    db = SessionLocal()
+    p = next((x for x in db.query(Project).order_by(Project.id.desc())
+              if x.report and _stored_answers(db, x).get("Assumptions!C16")), None)
+    if p is None:
+        return ["no project with a filled workbook to test the chain order against"]
+    a = _stored_answers(db, p)
+    pk, t = _resolve_template(resolve_purpose(p.purpose, p.financial_format), a,
+                              p.industry, p.purpose)
+    ramp, base = dict(a), dict(a)
+    ramp["Assumptions!C16"] = base["Assumptions!C16"] = 1_000_000
+    ramp["Assumptions!C18"], base["Assumptions!C18"] = 0.25, 1.0
+    for d in (ramp, base):
+        d.pop("_scale_capacity_before_raise", None)
+    rv = _reconcile_all(ramp, p, t).get("Assumptions!C16")
+    bv = _reconcile_all(base, p, t).get("Assumptions!C16")
+    if rv and bv and abs(rv - bv) > max(bv * 0.01, 1):
+        return [f"a year-1 ramp in C18 still changes the volume ({bv:,.0f} -> {rv:,.0f}): "
+                f"reconcile_working_capital must run BEFORE reconcile_scale"]
+    return []
+
+
 def main() -> int:
     results = []
     for folder in FOLDERS:
@@ -216,7 +274,23 @@ def main() -> int:
             who = sorted({f for (f, n, p) in results if n == name and p == problem})
             print(f"  [{name}]\n     {problem}\n     affects: {who}")
 
-    print(f"\n{'ALL INVARIANTS HOLD' if not failures else f'{failures} FAILING CELLS'}")
+    model_problems = _model_invariants()
+    print(f"\nevery industry has a revenue-stream profile: "
+          f"{'ok' if not model_problems else 'FAIL'}")
+    for p in model_problems:
+        print(f"     {p}")
+
+    try:
+        order_problems = _chain_order_invariant()
+    except Exception as exc:
+        order_problems = [f"check errored: {type(exc).__name__}: {exc}"]
+    print(f"a year-1 ramp in C18 does not inflate the volume: "
+          f"{'ok' if not order_problems else 'FAIL'}")
+    for p in order_problems:
+        print(f"     {p}")
+
+    failures += len(model_problems) + len(order_problems)
+    print(f"\n{'ALL INVARIANTS HOLD' if not failures else f'{failures} FAILURES'}")
     return 1 if failures else 0
 
 

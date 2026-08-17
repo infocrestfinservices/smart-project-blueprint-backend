@@ -142,7 +142,17 @@ _WC_DAY_CELLS = {
     "Assumptions!C52": 45,   # debtors / receivables
     "Assumptions!C53": 30,   # creditors / payables
 }
+# A POSITIVE holding period below this many days is not a business fact, it is a unit
+# error — nobody is given 0.4 days of supplier credit, and no factory turns its raw
+# material over in a single day. ZERO is left alone: a software or service business
+# genuinely holds no stock, and the cell means "not applicable" there.
+_WC_MIN_DAYS = 3
 _GROWTH_Y1_CELL = "Assumptions!C18"
+# The whole five-year row. C is the base year; D..G are years 2-5.
+_GROWTH_CELLS = [f"Assumptions!{c}18" for c in "CDEFG"]
+# Below this, a later year's "index" is not an index. The row is labelled "Growth index
+# (Year 1 = 100%)", so year 3 of a growing business reads 1.32, never 0.15.
+_GROWTH_RATE_CEILING = 0.5
 _GROSS_MARGIN_CELL = "Assumptions!C25"
 
 
@@ -161,19 +171,59 @@ def reconcile_working_capital(answers: dict, project) -> dict:
         return answers
     out = dict(answers)
 
-    # 1. Holding-period days — nothing in this model legitimately exceeds a year.
+    # 1. Holding-period days. Nothing legitimately exceeds a year — and, the other way
+    #    round, a positive period under _WC_MIN_DAYS is a unit error too. Only the upper
+    #    bound was guarded, so a fill that came back with 1 day of raw material, 1 day of
+    #    finished goods, 1 day of receivables and 0.4 days of creditors sailed through:
+    #    the business then needs almost no working capital, borrows less, and its profit
+    #    and DSCR come out flattering (4.03x against a realistic 1.91x on the same
+    #    project). That is the direction of error a lender must never be shown.
     for cell, default in _WC_DAY_CELLS.items():
         v = _num(out.get(cell))
-        if v is not None and v > 365:
+        if v is None:
+            continue
+        if v > 365:
             logger.info("working-capital: %s = %s days is absurd; using %d", cell, v, default)
             out[cell] = default
+        elif 0 < v < _WC_MIN_DAYS:
+            logger.info("working-capital: %s = %s days is implausibly short; using %d",
+                        cell, v, default)
+            out[cell] = default
 
-    # 2. Year-1 growth index is the base year: it must be ~1.0. A value like 0.1875 scales
-    #    the whole first year to a fraction of itself.
+    # 2. The growth-index row. Year 1 is the base year and must be ~1.0; a value like
+    #    0.1875 scales the whole first year to a fraction of itself.
     g = _num(out.get(_GROWTH_Y1_CELL))
     if g is not None and not (0.5 <= g <= 1.5):
         logger.info("working-capital: Year-1 growth index %s reset to 1.0 (base year)", g)
         out[_GROWTH_Y1_CELL] = 1.0
+
+    # 2b. Years 2-5 were never guarded, and that is a worse hole than the year-1 one.
+    #     The row is a CUMULATIVE index against year 1 — year 3 of a business growing 15% a
+    #     year reads 1.32. The fill kept writing the year-on-year RATE instead: 0.15 where
+    #     1.15 was meant. Nothing caught it, and the model then read year 2 as 15% of year
+    #     1 — revenue "grew" from ₹1.29 Cr to ₹21 L, net margin came out at −364% and DSCR
+    #     at −2.67x, on a business whose inputs were perfectly reasonable. Two live reports
+    #     went out like that.
+    #
+    #     A value under the ceiling is read as the rate it plainly is and compounded onto
+    #     the year before it, so the promoter's intended 15% a year is what the model gets.
+    prev = _num(out.get(_GROWTH_Y1_CELL)) or 1.0
+    for cell in _GROWTH_CELLS[1:]:
+        v = _num(out.get(cell))
+        if v is None:
+            continue
+        if 0 < v < _GROWTH_RATE_CEILING:
+            fixed = round(prev * (1 + v), 4)
+            logger.info("growth index: %s = %s is a growth RATE, not an index; "
+                        "compounding to %s", cell, v, fixed)
+            out[cell] = fixed
+        elif v <= 0:
+            # Zero or negative cannot be an index at all — hold the previous year flat
+            # rather than collapse the projection to nothing.
+            logger.info("growth index: %s = %s is not a valid index; holding at %s",
+                        cell, v, prev)
+            out[cell] = prev
+        prev = _num(out.get(cell)) or prev
 
     # 3. Gross margin is a 0-1 fraction — but ONLY for the volume-price family; for the
     #    capacity family C25 is a per-unit raw-material cost and must never be touched.
@@ -183,12 +233,28 @@ def reconcile_working_capital(answers: dict, project) -> dict:
     except Exception:
         fam = ""
     if fam == "volume_price":
+        model = get_operating_model(getattr(project, "industry", "") or "")
+        band = getattr(model, "margin_hint", None)
         m = _num(out.get(_GROSS_MARGIN_CELL))
         if m is not None and not (0 < m <= 1):
             fixed = m / 100 if 1 < m <= 100 else 0.6   # 60 -> 0.60; anything wilder -> default
             if not (0 < fixed <= 1):
                 fixed = 0.6
             logger.info("working-capital: gross margin %s -> %s (must be a 0-1 fraction)", m, fixed)
+            out[_GROSS_MARGIN_CELL] = round(fixed, 4)
+            m = fixed
+        # 3b. And it must be the margin THIS INDUSTRY runs at. `margin_hint` has been on
+        #     every operating model from the start and nothing ever read it — so the AI's
+        #     figure went through unchecked. A consultancy came back at 42%, a goods-trade
+        #     margin: cost of sales then ate 58% of revenue while direct wages took another
+        #     33%, which is the same people counted twice. 91% of revenue gone before a
+        #     single overhead, four straight loss-making years and a NEGATIVE DSCR — on
+        #     inputs that were otherwise sane.
+        if band and m is not None and not (band[0] <= m <= band[1]):
+            fixed = min(max(m, band[0]), band[1])
+            logger.info("gross margin: %s%% is outside the %s band for %s; using %s%%",
+                        round(m * 100, 1), model.key, getattr(model, "display_name", ""),
+                        round(fixed * 100, 1))
             out[_GROSS_MARGIN_CELL] = round(fixed, 4)
 
     return out
@@ -300,6 +366,15 @@ def reconcile_industry(answers: dict, project) -> dict:
 
 
 _CAPACITY = "Assumptions!C16"
+# THE SAME CELL AS _GROWTH_Y1_CELL ABOVE, and the two guards read it as different things:
+# here it is year-1 capacity UTILISATION and is DIVIDED by; in reconcile_working_capital it
+# is the year-1 growth INDEX and is reset to 1.0 whenever it falls outside 0.5-1.5. Whichever
+# runs last wins, and the other's work is left stale. That is exactly how the solar plant
+# (#59) shipped: the AI put a 25% year-1 ramp in C18, scale divided by it and quadrupled the
+# volume, working capital then reset the cell to 1.0, and nobody went back — a 5.76 MW output
+# on a capex that buys 2.12 MW. reconcile_working_capital MUST therefore run BEFORE
+# reconcile_scale, which is how _reconcile_all now orders them; verify_templates.py asserts
+# it so a future reorder fails loudly instead of silently.
 _UTIL_Y1 = "Assumptions!C18"
 _PRICE = "Assumptions!C23"
 _UNIT_COSTS = ("Assumptions!C25", "Assumptions!C27", "Assumptions!C29")
@@ -307,7 +382,12 @@ _MONTHLY_FIXED = ("Assumptions!C32", "Assumptions!C34", "Assumptions!C36", "Assu
 _SELLING_PCT = "Assumptions!C40"
 
 
-def reconcile_scale(answers: dict) -> dict:
+# Where reconcile_scale parks the volume it found before raising it, so a later pass can
+# tell its own work from the client's. Not a cell reference, so fill_template skips it.
+_SCALE_ORIGINAL = "_scale_capacity_before_raise"
+
+
+def reconcile_scale(answers: dict, project=None) -> dict:
     """Size the operation so the business is actually viable.
 
     The capacity cell is an ANNUAL volume, but the label carries no period, so the AI
@@ -321,7 +401,15 @@ def reconcile_scale(answers: dict) -> dict:
 
         capacity = annual fixed costs / (utilisation × (price×(0.8 − selling%) − unit cost))
 
-    Only applied when the model as filled is NOT viable, and never scaled down."""
+    Only applied when the model as filled is NOT viable, and never scaled down BELOW what
+    it was given. It is called more than once — see the loop in `_reconcile_all` — because
+    the volume, the ancillary streams and the wage bill are mutually dependent: the volume
+    sizes the streams, the streams size the labour, and the labour is part of the fixed cost
+    the volume was solved from. One pass left the volume sized for a cost base that the
+    later guards had already changed, which is how the solar plant ended up generating 4x
+    what its own costs needed. Repeated passes settle it, and the raise this function made
+    can be walked back — never past the figure it started from, and never past the plant the
+    project cost can physically buy."""
     if not isinstance(answers, dict) or _CAPACITY not in answers:
         return answers
     out = dict(answers)
@@ -329,6 +417,20 @@ def reconcile_scale(answers: dict) -> dict:
     util = _num(out.get(_UTIL_Y1)) or 1.0
     price = _num(out.get(_PRICE))
     if not cap or not price or cap <= 0 or price <= 0 or util <= 0:
+        return out
+
+    # Where the output is fixed by the plant that was bought, the plant decides — not the
+    # cost base, and not this function's 20%-margin solve. Checked before anything else so
+    # neither the raise nor the walk-back below can move a generation project off its own
+    # physics. The band leaves room for a real difference in build cost or yield.
+    physical = _installed_output(project)
+    if physical:
+        lo, hi = physical * _PHYSICAL_BAND[0], physical * _PHYSICAL_BAND[1]
+        if not (lo <= cap <= hi):
+            out[_CAPACITY] = round(physical, 2)
+            _rescale_stream_volumes(out, physical / cap)
+            logger.info("scale: output %.0f implies a plant the project cost does not buy "
+                        "(it funds %.0f a year); sized to the installed capacity", cap, physical)
         return out
 
     unit_cost = sum(_num(out.get(c)) or 0.0 for c in _UNIT_COSTS)
@@ -348,11 +450,133 @@ def reconcile_scale(answers: dict) -> dict:
         return out
 
     needed = fixed / (util * contribution)
+    ceiling = _capacity_ceiling(project, price, util)
+
     if needed > cap:
-        out[_CAPACITY] = round(needed, 2)
-        logger.info("scale: capacity %.0f gave EBITDA %.0f on revenue %.0f (not viable); "
-                    "raised to %.0f for a ~20%% margin", cap, ebitda, revenue, needed)
+        target = needed
+        if ceiling and target > ceiling:
+            logger.warning("scale: %.0f units would need more plant than the project cost "
+                           "buys; capped at %.0f", target, ceiling)
+            target = max(cap, ceiling)          # a cap must never become a raise-in-reverse
+        if target > cap:
+            # Remember what we found. If a later guard changes the cost base this volume was
+            # solved from, the next pass can walk our own raise back — but never past this.
+            out.setdefault(_SCALE_ORIGINAL, cap)
+            out[_CAPACITY] = round(target, 2)
+            logger.info("scale: capacity %.0f gave EBITDA %.0f on revenue %.0f (not viable); "
+                        "raised to %.0f for a ~20%% margin", cap, ebitda, revenue, target)
+        return out
+
+    # Nothing to raise. The remaining case is a raise WE made on an earlier pass that the
+    # cost guards have since made too big — see _SCALE_ORIGINAL. Gated on that key, so this
+    # branch can only ever undo our own work inside this one reconcile run; a volume the AI
+    # or the user filled is never reduced.
+    floor = _num(out.get(_SCALE_ORIGINAL))
+    if floor is None:
+        return out
+    target = max(floor, needed)
+    if ceiling:
+        target = min(target, ceiling)
+    if target < cap * 0.995:
+        out[_CAPACITY] = round(target, 2)
+        _rescale_stream_volumes(out, target / cap)
+        logger.info("scale: costs settled at %.0f a year, so the earlier raise to %.0f is "
+                    "%.1fx more plant than the business needs; brought back to %.0f",
+                    fixed, cap, cap / max(target, 1e-9), target)
     return out
+
+
+# What a rupee of capex physically buys, for the generation technologies where that is a
+# settled engineering figure rather than a judgement: (cost per MW, annual output per MW).
+# Deliberately narrow. `renewable_energy` is one operating-model key covering very different
+# machines — a biomass plant runs several times the annual output per MW of a solar farm on
+# a similar capex — so applying solar's numbers across the key would resize a biomass project
+# wrongly. Matched on the project's own words, and anything not recognised is left entirely
+# to the ordinary cost-based sizing.
+_GENERATION_PHYSICS = {
+    "solar": (4.25e7, 1_750_000),      # ~Rs 4.25 Cr/MW, ~1,750 kWh per kW a year
+    "wind":  (6.50e7, 2_200_000),      # ~Rs 6.50 Cr/MW, a ~25% capacity factor
+}
+# How far from the physical figure a project may sit before it is pulled back. A better
+# tariff, a tracker instead of a fixed tilt or a cheaper build all move this legitimately;
+# a plant at half or double its own capex is not a variation, it is an error.
+_PHYSICAL_BAND = (0.65, 1.55)
+
+
+def _installed_output(project):
+    """The annual output the project cost physically buys, or None.
+
+    `reconcile_scale` sizes the volume from the COST BASE — the volume at which a 20% EBITDA
+    margin appears. For a factory that is sound: you can add a shift or a machine. For a
+    power plant it is not, and it fails in both directions. On #59 low fixed costs let it run
+    the volume up to a 5.76 MW output; on #60, with fixed costs of only Rs 38 L a year, the
+    same rule declared 0.66 MW "viable" and left Rs 9 Cr of assets earning nothing — DSCR
+    0.73x. The plant produces what the plant produces, and that is knowable from the capex.
+    """
+    if not project:
+        return None
+    cost = _num(getattr(project, "project_cost", None)) or 0.0
+    if cost <= 0:
+        return None
+    try:
+        from financial_engine.industry_calc.operating_models import get_operating_model
+        m = get_operating_model(getattr(project, "industry", "") or "")
+    except Exception:
+        return None
+    if not m or m.key != "renewable_energy":
+        return None
+    words = " ".join(str(getattr(project, f, "") or "") for f in
+                     ("sub_industry", "title", "project_description")).casefold()
+    for tech, (capex_per_mw, output_per_mw) in _GENERATION_PHYSICS.items():
+        if tech in words:
+            return (cost / capex_per_mw) * output_per_mw
+    return None
+
+
+def _capacity_ceiling(project, price: float, util: float):
+    """The most output the money in the project can physically buy, or None.
+
+    A factory can be scaled by adding a shift or a machine, so its volume is a commercial
+    judgement. Generation is not: a 2 MW solar plant produces what 2 MW produces, however
+    the arithmetic would prefer it. `reconcile_scale` had no concept of that, and on the
+    solar test (#59) it sized a 5.76 MW output onto a capex that buys 2.1 MW.
+
+    Expressed as an asset-turnover ceiling — the most annual revenue a rupee of project
+    cost can support in this industry — because that is the form the number is actually
+    known in, and it needs no new input from the user. Only set where output really is
+    bounded by installed capital; None everywhere else, where the ratio varies too widely
+    with how much of the cost is working capital to bound anything safely.
+    """
+    if not project or not price or price <= 0 or util <= 0:
+        return None
+    cost = _num(getattr(project, "project_cost", None)) or 0.0
+    if cost <= 0:
+        return None
+    try:
+        from financial_engine.industry_calc.operating_models import get_operating_model
+        m = get_operating_model(getattr(project, "industry", "") or "")
+    except Exception:
+        return None
+    turnover = getattr(m, "max_asset_turnover", None) if m else None
+    if not turnover:
+        return None
+    return (cost * turnover) / (price * util)
+
+
+def _rescale_stream_volumes(out: dict, factor: float) -> None:
+    """Keep the ancillary streams in the same proportion to a core that just changed.
+
+    The streams were seeded as core volume x stream_vol_per_core. Moving the core without
+    moving them would leave a plant generating a quarter as much while still selling the
+    same REC income — the ratio the industry profile set would silently break. Works in
+    both directions: the core can be sized up to its installed capacity as well as down.
+    """
+    if not factor or factor <= 0 or factor == 1:
+        return
+    for cell in _STREAM_VOL_CELLS:
+        v = _num(out.get(cell))
+        if v and v > 0:
+            out[cell] = round(v * factor, 2)
 
 
 _STREAM_VOL_CELLS = ("Assumptions!C66", "Assumptions!C67",
@@ -365,6 +589,67 @@ _STREAM_SANITY_CAP = 1.0
 # A stream volume this many times larger than the industry expects is not a volume at
 # all — it is the annual RUPEE amount from the pre-build-up format sitting in the cell.
 _LEGACY_VOLUME_MULTIPLE = 20.0
+
+
+# Where the manufacturing workbook writes the name of each ancillary stream. Six industries
+# borrow that workbook (they have no template of their own), so on a solar plant or a farm
+# these rows read "Job work / contract manufacturing" and "Trading of bought-out items" — a
+# factory's vocabulary on a business that is not a factory. The numbers were always right;
+# only the wording was borrowed with the book. Each entry is (sheet!cell, pattern), where the
+# pattern carries the suffix that row uses. Row bases: Assumptions 66-69, Production 11-14,
+# Sales 10/14/18/22 (units, rate, revenue), P & L 6-9.
+_STREAM_LABEL_CELLS = tuple(
+    [(f"Assumptions!B{66 + i}", "{label}") for i in range(4)]
+    + [(f"Production!A{11 + i}", "{label} — units") for i in range(4)]
+    + [(f"Sales!A{10 + 4 * i}", "{label} — units") for i in range(4)]
+    + [(f"Sales!A{11 + 4 * i}", "{label} — ₹ / unit") for i in range(4)]
+    + [(f"Sales!A{12 + 4 * i}", "{label}") for i in range(4)]
+    + [(f"P & L!A{6 + i}", "{label}") for i in range(4)]
+)
+# The block heading above those rows says "ANCILLARY / BY-PRODUCT OUTPUT" — also a factory's
+# word. Neutral wording that stays true for a farm, a mine and a solar plant alike.
+_STREAM_BLOCK_HEADING = ("Production!A10", "ANCILLARY / OTHER OPERATING OUTPUT  (units)")
+
+
+def relabel_streams(answers: dict, project) -> dict:
+    """Name the four ancillary streams in the industry's own words.
+
+    Labels only — not one number moves. The cells written here hold text captions; every
+    volume, price and formula is untouched, so the model this produces is arithmetically
+    identical to the one produced without it.
+
+    Applies ONLY to the capacity family, because only those industries borrow the
+    manufacturing workbook and only that workbook has this row layout. An industry with its
+    own template already names its own streams and is never touched, and an industry that
+    declares no `stream_labels` (manufacturing itself, textile, automobile — genuine
+    factories, for whom scrap and job work are exactly right) keeps the workbook's wording.
+    """
+    if not isinstance(answers, dict):
+        return answers
+    out = dict(answers)
+    try:
+        from financial_engine.industry_calc.operating_models import get_operating_model
+        m = get_operating_model(getattr(project, "industry", "") or "")
+    except Exception:
+        return out
+    labels = getattr(m, "stream_labels", None) if m else None
+    if not m or not labels or m.family != "capacity":
+        return out
+
+    for cell, pattern in _STREAM_LABEL_CELLS:
+        idx = _STREAM_LABEL_INDEX[cell]
+        out[cell] = pattern.format(label=labels[idx])
+    out[_STREAM_BLOCK_HEADING[0]] = _STREAM_BLOCK_HEADING[1]
+    logger.info("streams: relabelled for %s -> %s", m.key, list(labels))
+    return out
+
+
+# cell -> which of the four streams it names, derived from the map above so the two can
+# never drift apart.
+_STREAM_LABEL_INDEX = {}
+for _grp_start in range(0, len(_STREAM_LABEL_CELLS), 4):
+    for _i in range(4):
+        _STREAM_LABEL_INDEX[_STREAM_LABEL_CELLS[_grp_start + _i][0]] = _i
 
 
 def reconcile_streams(answers: dict, project) -> dict:

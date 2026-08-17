@@ -1,5 +1,11 @@
-from fastapi import FastAPI
+import secrets
+
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+
+from config import settings
 
 from routers.industry_router import router as industry_router
 from routers.country_router import router as country_router
@@ -11,11 +17,22 @@ from routers.auth_router import router as auth_router
 from routers.generation_router import router as generation_router
 from routers.templates_router import router as templates_router
 from routers.bank_loan_router import router as bank_loan_router
-from routers.engine_test_router import router as engine_test_router  # temporary: engine validation
+from routers.payment_router import router as payment_router
+from routers.admin_router import router as admin_router
+from routers.invoice_router import router as invoice_router
+from routers.engine_test_router import router as engine_test_router  # dev only, see below
 
+IS_PRODUCTION = settings.ENV.strip().lower() == "production"
+
+# The automatic /docs, /redoc and /openapi.json are turned OFF and re-added below behind a
+# guard. They list every endpoint and every field — a complete map of the attack surface —
+# and they are only ever useful to staff.
 app = FastAPI(
     title="AI Feasibility Study & Project Report Generator",
-    version="1.0.0"
+    version="1.0.0",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 app.add_middleware(
@@ -42,7 +59,14 @@ app.include_router(auth_router)
 app.include_router(generation_router)
 app.include_router(templates_router)
 app.include_router(bank_loan_router)
-app.include_router(engine_test_router)  # temporary: engine validation, remove before prod
+app.include_router(payment_router)
+app.include_router(admin_router)
+app.include_router(invoice_router)
+# The engine-test harness is a development tool. It is admin-only wherever it exists (see
+# the router), and in production it does not exist at all — the strongest form of "not
+# reachable" is "not mounted".
+if not IS_PRODUCTION:
+    app.include_router(engine_test_router)
 
 
 @app.on_event("startup")
@@ -70,3 +94,47 @@ def home():
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
+
+# ── API docs ───────────────────────────────────────────────────────────────────
+# Guarded with HTTP Basic rather than with the admin token, and the reason is mechanical:
+# a browser navigating to /docs cannot attach an Authorization: Bearer header, and the
+# Swagger page then fetches /openapi.json as a second request that cannot carry one either.
+# Depends(get_admin_user) there would lock the team out along with everyone else. Basic auth
+# is the one scheme a browser will prompt for and then replay on both requests.
+#
+# Outside production the docs stay open, because that is a developer's machine or a staging
+# box. In production they exist only if DOCS_PASSWORD is set — no password, no docs. Failing
+# closed is deliberate: forgetting to set a variable should hide the API reference, not
+# publish it.
+_basic = HTTPBasic(auto_error=False)
+
+
+def _docs_guard(credentials: HTTPBasicCredentials = Depends(_basic)):
+    if not IS_PRODUCTION:
+        return True
+    if not settings.DOCS_PASSWORD:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    # compare_digest on both halves, so the comparison takes the same time whether the
+    # username was wrong, the password was wrong, or both.
+    ok_user = secrets.compare_digest((credentials.username if credentials else ""),
+                                     settings.DOCS_USER)
+    ok_pass = secrets.compare_digest((credentials.password if credentials else ""),
+                                     settings.DOCS_PASSWORD)
+    if not (ok_user and ok_pass):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authorised",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return True
+
+
+@app.get("/openapi.json", include_in_schema=False)
+def openapi_schema(_=Depends(_docs_guard)):
+    return app.openapi()
+
+
+@app.get("/docs", include_in_schema=False)
+def swagger_ui(_=Depends(_docs_guard)):
+    return get_swagger_ui_html(openapi_url="/openapi.json", title="API docs")

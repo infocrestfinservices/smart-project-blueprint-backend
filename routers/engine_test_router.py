@@ -29,8 +29,9 @@ import os
 import tempfile
 from io import BytesIO
 
-from fastapi import APIRouter, HTTPException
+from fastapi import Depends, APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
+from dependencies import get_admin_user
 from pydantic import BaseModel, Field
 
 from engine_test.template_definition import (
@@ -40,8 +41,10 @@ from services.excel_builder import build_excel_workbook
 
 logger = logging.getLogger("engine_test")
 
-router = APIRouter(prefix="/engine-test", tags=["Engine Test (temporary)"])
-
+# STAFF ONLY, and see main.py — this router is not mounted at all when ENV is
+# production. Two layers on purpose: the mount decides whether the harness exists on
+# a given deployment, the dependency decides who may use it where it does.
+router = APIRouter(prefix="/engine-test", tags=["Engine Test (temporary)"], dependencies=[Depends(get_admin_user)])
 XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 

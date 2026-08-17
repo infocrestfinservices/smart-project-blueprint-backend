@@ -7,6 +7,7 @@ from models.project_model import Project
 from models.report_model import Report
 from models.questionnaire_model import QuestionnaireAnswer
 from models.feasibility_model import FeasibilityScore
+from models.payment_model import Payment
 
 def init():
     print("Creating tables...")

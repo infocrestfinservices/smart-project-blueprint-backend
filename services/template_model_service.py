@@ -166,7 +166,11 @@ def _match_option(value, options: list):
 
 
 def _generate_chunk(project, agent_context, fields, currency, constraints="") -> dict:
-    raw = invoke_llm(_prompt(project, agent_context, fields, currency, constraints))
+    # settings.CELLFILL_HEAVY decides which model fills the input cells — see config.py.
+    # Read at call time, not at import, so flipping it in .env takes effect on reload.
+    from config import settings
+    raw = invoke_llm(_prompt(project, agent_context, fields, currency, constraints),
+                     heavy=settings.CELLFILL_HEAVY)
     data = _extract_json(raw)
     types = {k: ftype for (k, _, ftype, _, _, _) in fields}
     opts = {k: o for (k, _, _, _, _, o) in fields}

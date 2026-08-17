@@ -92,6 +92,9 @@ def invoke_llm(prompt: str, model: str = None, heavy: bool = False) -> str:
       different provider entirely.
     - As a safety net, ANY empty answer from the cheap model is retried once on the heavy
       one, so a borderline prompt can never again leave the whole report failed.
+
+    The AGENTS deliberately stay on the cheap model and have no switch — see the note in
+    config.py. The narrative passes heavy=True; the cell-fill passes its own CELLFILL_HEAVY.
     """
     primary = HEAVY_MODEL if heavy else settings.DEEPSEEK_MODEL
     content, reason = _complete(prompt, primary)

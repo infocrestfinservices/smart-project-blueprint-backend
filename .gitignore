@@ -1,4 +1,3 @@
-```gitignore
 # ==========================
 # Python
 # ==========================
@@ -117,4 +116,7 @@ temp/
 # ==========================
 *.bak
 *.orig
-```
+
+# Per-project AI cover art. Generated at runtime and keyed to project ids in one database,
+# so it means nothing on a fresh deployment — the same reasoning as generated_reports.
+templates/cover_images/generated/

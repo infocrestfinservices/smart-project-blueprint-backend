@@ -24,7 +24,9 @@ from database import get_db
 from models.project_model import Project
 from models.report_model import Report
 from models.questionnaire_model import QuestionnaireAnswer
-from dependencies import get_owned_project
+from dependencies import get_owned_project, get_current_user
+from models.user_model import User
+from services.entitlements import may_generate, may_export
 
 from purpose_config import resolve_purpose, get_config
 from template_config import (default_template, get_template, find_template_by_id,
@@ -288,6 +290,17 @@ class _AsCapacity:
         return getattr(self._project, name)
 
 
+# How many times the scale/streams/labour trio may be re-run before we stop and say so.
+_SCALE_PASSES = 3
+
+
+def _num_or_none(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def _reconcile_all(answers: dict, project: Project, template=None) -> dict:
     """The deterministic post-AI guard chain, in the one order that is correct.
 
@@ -321,7 +334,8 @@ def _reconcile_all(answers: dict, project: Project, template=None) -> dict:
                                                reconcile_identity, reconcile_phasing,
                                                reconcile_capex, reconcile_working_capital,
                                                reconcile_streams, reconcile_operating_costs,
-                                               reconcile_drivers, reconcile_existing_loan)
+                                               reconcile_drivers, reconcile_existing_loan,
+                                               relabel_streams)
     # First: without numeric year/month drivers every projected cell evaluates to
     # #VALUE!, and nothing downstream can be judged.
     answers = reconcile_drivers(answers, project)
@@ -330,15 +344,35 @@ def _reconcile_all(answers: dict, project: Project, template=None) -> dict:
     answers = reconcile_industry(answers, project)
     answers = reconcile_financing(answers, project)
     answers = reconcile_capex(answers, project)
-    answers = reconcile_scale(answers)
     answers = reconcile_working_capital(answers, project)
-    # Streams must run AFTER reconcile_scale: it sizes the volume/price cells the stream
-    # seed is derived from, so seeding before it would peg the ancillary income to a
-    # capacity the model then discards.
-    answers = reconcile_streams(answers, project)
-    # Labour is measured against TOTAL revenue, so it must run AFTER the streams are
-    # sized — that is what makes the ancillary income carry its share of the staffing.
-    answers = reconcile_operating_costs(answers, project)
+    # Scale, streams and labour are MUTUALLY dependent, and running them once in a line is
+    # not enough. The volume is solved from the fixed costs; the streams are sized off the
+    # volume; the wage bill is pegged to the revenue the streams complete — and that wage
+    # bill is part of the fixed cost the volume came from. On the solar plant (#59) the
+    # first pass raised the capacity against a ~Rs 22.4 L monthly cost base, then the wage
+    # guard cut that base to Rs 5.6 L, and nothing went back to the volume: the plant was
+    # left generating exactly 4x what it needed to, a 5.76 MW output on a 2.1 MW capex.
+    # Iterating to a fixed point removes the whole class of error rather than that one
+    # instance. Two passes settle every project measured; the third is a stop, not a plan.
+    for _pass in range(_SCALE_PASSES):
+        before = _num_or_none(answers.get("Assumptions!C16"))
+        # Streams run AFTER scale: it sizes the volume/price cells the stream seed derives
+        # from, so seeding first would peg the ancillary income to a capacity then discarded.
+        answers = reconcile_scale(answers, project)
+        answers = reconcile_streams(answers, project)
+        # Labour is measured against TOTAL revenue, so it must run AFTER the streams are
+        # sized — that is what makes the ancillary income carry its share of the staffing.
+        answers = reconcile_operating_costs(answers, project)
+        after = _num_or_none(answers.get("Assumptions!C16"))
+        if before is None or after is None or abs(after - before) <= abs(before) * 0.005:
+            break
+    else:
+        logger.warning("reconcile: volume still moving after %d passes (now %s) — the "
+                       "guards are fighting each other on this project", _SCALE_PASSES,
+                       answers.get("Assumptions!C16"))
+    # Text only, and safe anywhere after the streams exist: it renames those four rows in
+    # the industry's own vocabulary when the industry is using a borrowed workbook.
+    answers = relabel_streams(answers, project)
     answers = reconcile_segments(answers, project)
     answers = reconcile_phasing(answers, project)
     return answers
@@ -422,65 +456,96 @@ def _build_agent_context(project: Project, purpose_key: str, answers: dict,
 
 def _preview_markdown(model: dict, purpose_key: str, project: Project,
                       excel_only: bool = False) -> str:
-    """On-screen preview: narrative + financial tables (so the report viewer can
-    render charts). The downloadable Word omits the heavy tables; Excel is the
-    authoritative model."""
+    """The short on-screen summary — NOT the report.
+
+    This used to be the whole document: every narrative section, then every financial
+    statement as a markdown table. It was the only thing that read the model's "sheets"
+    array, and printing it billed a second rendering of figures the workbook already holds
+    authoritatively. The screen now says what the project is and what the headline numbers
+    are; the two deliverables are downloaded from the buttons beneath it.
+    """
     cfg = get_config(purpose_key)
     md = [f"# {project.title or 'Project Report'}", f"_{cfg['label']}_\n"]
 
-    if excel_only:
-        # Say plainly that the workbook is the deliverable. Printing every section
-        # heading with "see the Excel model" underneath would read as a failed report
-        # rather than a deliberate workbook-only run.
-        md.append("> **Financial model built — written report not generated.**  \n"
-                  "> Download the Excel workbook below; every figure, schedule and CMA "
-                  "form is in it.  \n"
-                  "> To add the written report later, generate again with the report "
-                  "option on — the stored inputs are reused, so the numbers stay "
-                  "identical and only the prose is added.\n")
+    about = str(getattr(project, "project_description", "") or "").strip()
+    where = str(getattr(project, "location", "") or "").strip()
+    activity = str(getattr(project, "sub_industry", "") or
+                   getattr(project, "industry", "") or "").strip()
+    lead = " · ".join(x for x in (activity, where) if x)
+    if lead:
+        md.append(f"**{lead}**\n")
+    if about:
+        md.append(about + "\n")
 
-    kpis = model.get("kpis") or []
-    if kpis:
-        md.append("## Key Indicators\n")
-        md.append("| Indicator | Value |\n|---|---|")
-        for k in kpis[:16]:
-            md.append(f"| {k.get('label','')} | {k.get('value','')} |")
+    # The summary is the opening of what the model already wrote — never a second call.
+    summary = str((model.get("narrative") or {}).get("Executive Summary") or "").strip()
+    if summary:
+        opening = " ".join(summary.split("\n")[0].split())
+        if len(opening) > 460:
+            cut = opening[:460]
+            opening = cut[:cut.rfind(". ") + 1] if ". " in cut else cut.rsplit(" ", 1)[0] + "…"
+        md.append("## Summary\n")
+        md.append(opening + "\n")
+    else:
+        # No narrative — but that is only a SHORTFALL for a long report. The short report
+        # does not read the narrative at all (see short_report.py), so telling its reader
+        # "the written report was not generated" announced a failure that had not happened.
+        # In its place: who the borrower is, built from their own record, costing nothing.
+        md.append(_about_block(project))
+        if not _is_short(project) and excel_only:
+            md.append("\n_The written commentary was not generated for this run. To add it, "
+                      "regenerate with the report option on — the stored inputs are reused, "
+                      "so the numbers stay identical and only the prose is added._\n")
+
+    cards = (model.get("financial_summary") or {}).get("cards") or {}
+    rows = []
+    for key, label in (("revenue_y1", "Revenue · Year 1"), ("revenue_y5", "Revenue · Year 5"),
+                       ("ebitda_y5", "EBITDA · Year 5"), ("pat_y5", "Profit after tax · Year 5")):
+        v = cards.get(key)
+        if isinstance(v, (int, float)):
+            rows.append((label, _money(v)))
+    if isinstance(cards.get("avg_dscr"), (int, float)):
+        rows.append(("Average loan cover (DSCR)", f"{cards['avg_dscr']:.2f}x"))
+    if isinstance(cards.get("net_margin_y5"), (int, float)):
+        rows.append(("Net margin · Year 5", f"{cards['net_margin_y5'] * 100:.1f}%"))
+    if not rows:
+        rows = [(k.get("label", ""), k.get("value", "")) for k in (model.get("kpis") or [])[:6]]
+    if rows:
+        md.append("## At a glance\n")
+        md.append("| | |\n|---|---|")
+        md += [f"| {label} | {value} |" for label, value in rows]
         md.append("")
-
-    narrative = model.get("narrative") or {}
-    if not excel_only:
-        for sec in cfg["word_sections"]:
-            md.append(f"## {sec['title']}\n")
-            md.append(str(narrative.get(sec["title"])
-                          or "_See the Excel financial model for details._"))
-            md.append("")
-
-    # Sections the model added because the user asked for them. Without this the extra
-    # section was generated and then silently dropped, so a typed requirement produced a
-    # report that looked completely unchanged.
-    for title, body in narrative.items():
-        if any(title == s["title"] for s in cfg["word_sections"]) or not str(body).strip():
-            continue
-        md.append(f"## {title}\n")
-        md.append(str(body))
-        md.append("")
-
-    sheets = model.get("sheets") or []
-    if sheets:
-        md.append("## Financial Statements\n")
-        for s in sheets:
-            cols = s.get("columns") or []
-            rows = s.get("rows") or []
-            if not cols or not rows:
-                continue
-            md.append(f"### {s.get('name','')}\n")
-            md.append("| " + " | ".join(str(c) for c in cols) + " |")
-            md.append("|" + "|".join("---" for _ in cols) + "|")
-            for r in rows:
-                cells = [str(r[i]) if i < len(r) else "" for i in range(len(cols))]
-                md.append("| " + " | ".join(cells) + " |")
-            md.append("")
     return "\n".join(md)
+
+
+def _money(v):
+    a = abs(v)
+    if a >= 1e7:
+        return f"₹{v / 1e7:,.2f} Cr"
+    if a >= 1e5:
+        return f"₹{v / 1e5:,.2f} L"
+    return f"₹{v:,.0f}"
+
+
+def _about_block(project: Project) -> str:
+    """Who the borrower is — every line from the client's own record, so no model is asked
+    and nothing here can be invented."""
+    facts = [
+        ("Promoter", getattr(project, "promoter_name", None)),
+        ("Experience", getattr(project, "promoter_experience", None)),
+        ("Line of activity", getattr(project, "sub_industry", None)
+                             or getattr(project, "industry", None)),
+        ("Location", getattr(project, "location", None) or getattr(project, "country", None)),
+        ("Target market", getattr(project, "target_market", None)),
+        ("Customers served", getattr(project, "target_customers", None)),
+    ]
+    facts = [(k, str(v).strip()) for k, v in facts if v and str(v).strip()]
+    if not facts:
+        return ""
+    out = ["## About the company\n", "| | |", "|---|---|"]
+    out += [f"| {k} | {v} |" for k, v in facts]
+    out.append("")
+    return "\n".join(out)
 
 
 class BrandingRequest(BaseModel):
@@ -575,6 +640,27 @@ def _decode_data_url(data_url: str):
         return raw if raw else None
     except Exception:
         return None
+
+
+@router.get("/{project_id}/cover")
+def download_cover(project: Project = Depends(get_owned_project)):
+    """The project's cover artwork, for the screen shown after generating.
+
+    The SAME image the Word report's cover carries: it is generated once per project and
+    cached on disk, so showing it here costs nothing and the screen cannot show a different
+    picture from the document. Falls back to the bundled industry photograph, then to a
+    drawn motif — so there is always something, and never a broken image.
+    """
+    from services.cover_art import cover_art
+    try:
+        data = cover_art(project.industry, _project_dict(project, {}))
+    except Exception:
+        logger.warning("cover: artwork unavailable for project %s", project.id, exc_info=True)
+        data = None
+    if not data:
+        raise HTTPException(status_code=404, detail="No cover image for this project.")
+    return StreamingResponse(BytesIO(data), media_type="image/jpeg",
+                             headers={"Cache-Control": "public, max-age=86400"})
 
 
 @router.get("/{project_id}/sections")
@@ -738,9 +824,21 @@ def _load_model(project: Project) -> dict:
         raise HTTPException(status_code=500, detail="Stored financial model is corrupted. Re-generate the report.")
 
 
+# 402 Payment Required, not 403: the caller is who they say they are and owns the project —
+# what is missing is a plan that covers this. The frontend keys the upgrade prompt off it,
+# so it must not be conflated with an auth failure.
+def _require(allowed_reason):
+    allowed, why = allowed_reason
+    if not allowed:
+        raise HTTPException(status_code=402, detail=why)
+
 @router.post("/{project_id}")
 def generate(req: GenerateRequest, project: Project = Depends(get_owned_project),
-             db: Session = Depends(get_db)):
+             db: Session = Depends(get_db),
+             current_user: User = Depends(get_current_user)):
+    # A project that has already been generated passes: that is a REGENERATION of a report
+    # the user has, not a new one, and the product actively encourages re-running it.
+    _require(may_generate(db, current_user, project.id))
     purpose_key = resolve_purpose(project.purpose, project.financial_format)
 
     # Gather the answers: everything already stored for this project, with anything the
@@ -1041,7 +1139,9 @@ def _is_short(project: Project) -> bool:
 
 
 @router.get("/{project_id}/excel")
-def download_excel(project: Project = Depends(get_owned_project), db: Session = Depends(get_db)):
+def download_excel(project: Project = Depends(get_owned_project), db: Session = Depends(get_db),
+                   current_user: User = Depends(get_current_user)):
+    _require(may_export(current_user, "excel"))
     purpose_key = resolve_purpose(project.purpose, project.financial_format)
     answers = _stored_answers(db, project)
 
@@ -1231,7 +1331,9 @@ def _build_word_report(project: Project, db: Session):
 
 
 @router.get("/{project_id}/word")
-def download_word(project: Project = Depends(get_owned_project), db: Session = Depends(get_db)):
+def download_word(project: Project = Depends(get_owned_project), db: Session = Depends(get_db),
+                  current_user: User = Depends(get_current_user)):
+    _require(may_export(current_user, "word"))
     try:
         data, base = _build_word_report(project, db)
     except Exception as e:
@@ -1242,7 +1344,9 @@ def download_word(project: Project = Depends(get_owned_project), db: Session = D
 
 
 @router.get("/{project_id}/pdf")
-def download_pdf(project: Project = Depends(get_owned_project), db: Session = Depends(get_db)):
+def download_pdf(project: Project = Depends(get_owned_project), db: Session = Depends(get_db),
+                 current_user: User = Depends(get_current_user)):
+    _require(may_export(current_user, "pdf"))
     """PDF of the report, rendered by LibreOffice from the SAME Word document that the
     .docx download produces — so the PDF, Word and Excel all carry identical figures."""
     from services.recalc_service import to_pdf, libreoffice_available

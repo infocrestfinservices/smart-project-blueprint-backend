@@ -61,13 +61,12 @@ SAMPLE REPORT BLUEPRINT — this is the reference template for this PURPOSE. Tre
 {sample_blueprint}
 """
 
-    sheet_specs = []
-    for s in config["excel_sheets"]:
-        req = needed.get(s["name"])
-        line = f'- "{s["name"]}": {s["purpose"]}'
-        if req:
-            line += f'  [MUST include these exact column headers so charts work: {req}]'
-        sheet_specs.append(line)
+    # The model used to be asked for a full "sheets" array as well — roughly 40% of the
+    # output tokens. Nothing read it except the on-screen preview's statement tables, and
+    # that screen no longer shows them: the WORKBOOK comes from the filled template and the
+    # Word report reads its figures from that recalculated workbook, never from here. So it
+    # is no longer requested, which makes the one paid call meaningfully cheaper and faster.
+    # `config["excel_sheets"]` still drives the template side; it is simply not prompted for.
 
     # "Business Model" is required of EVERY purpose, not listed per-purpose: a lender reads
     # it to understand what they are lending against before any projection means anything.
@@ -121,14 +120,8 @@ Return ONLY a single JSON object (no markdown, no commentary) with EXACTLY this 
   "narrative": {{
 {chr(10).join(f'      "{w["title"]}": "<2-4 short paragraphs of professional prose; use \\n for line breaks; bullet lines may start with - >," ' for w in config["word_sections"])}
   }},
-  "kpis": [ {{ "label": "e.g. IRR / DSCR / Break-even", "value": "e.g. 18.4% / 1.85 / 62%" }} ],
-  "sheets": [
-     {{ "name": "<sheet name>", "columns": ["<header>", ...], "rows": [ ["<cell>", 123, ...], ... ], "total_row": false }}
-  ]
+  "kpis": [ {{ "label": "e.g. IRR / DSCR / Break-even", "value": "e.g. 18.4% / 1.85 / 62%" }} ]
 }}
-
-The "sheets" array MUST contain exactly these sheets, in this order, each with sensible columns and fully populated numeric rows:
-{chr(10).join(sheet_specs)}
 
 The "narrative" object MUST contain AT LEAST these keys:
 {chr(10).join(section_specs)}
@@ -143,10 +136,11 @@ Rules:{f'''
   structure and emphasis. Re-read them before you write the narrative, and make the change
   they asked for visible in the output — do not return the same report you would have
   written without them.''' if ask else ''}
-- Numbers are numbers, not strings. The first column of a sheet is a label (string); other columns are numeric where applicable.
-- Keep each sheet to the rows that matter (typically 4-15 rows). Include a final "Total" row where it makes accounting sense and set "total_row": true for that sheet.
-- Do NOT put large financial tables inside the narrative — tables belong in "sheets".
-- Ensure the column headers required for charts (noted above) appear verbatim.
+- Write PROSE only. Do NOT reproduce the financial statements: every table, schedule and
+  CMA form is generated from the workbook itself, so a table written here is paid for twice
+  and can only disagree with the model. Quote a figure in a sentence where it makes the
+  point, and nothing more.
+- Numbers you quote are the ones given above. Do not invent others.
 - Output must be valid JSON and nothing else."""
 
 

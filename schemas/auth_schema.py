@@ -33,6 +33,7 @@ class UserResponse(BaseModel):
     email: str
     full_name: Optional[str] = None
     plan: Optional[str] = None
+    is_admin: bool = False
 
     class Config:
         from_attributes = True

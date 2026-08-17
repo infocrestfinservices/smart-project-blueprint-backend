@@ -73,3 +73,15 @@ def get_owned_project(
             detail="Project not found",
         )
     return project
+
+def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
+    """Staff only. Everything under /admin depends on this.
+
+    404, not 403. A 403 confirms that /admin exists and that this account simply is not on
+    the list, which tells an attacker their target and that the endpoint is worth attacking;
+    a 404 says only that there is nothing at that address, which is what a stranger should
+    be able to learn. Same reasoning as get_owned_project above.
+    """
+    if not getattr(current_user, "is_admin", False):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    return current_user

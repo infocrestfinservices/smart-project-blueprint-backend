@@ -14,14 +14,26 @@ before. No AI, template, Excel, orchestration or file-writing logic here.
 
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
+from dependencies import get_admin_user
 from services.generic_pipeline_service import run_report_pipeline
 
 logger = logging.getLogger("bank_loan")
 
-router = APIRouter(prefix="/bank-loan", tags=["Bank Loan"])
+# STAFF ONLY. This route ran the whole pipeline — AI call, workbook fill, LibreOffice
+# recalculation, and a retry on a low DSCR, so up to two AI calls per request — with no
+# login, no plan check and no rate limit. That was right when it was written: there were no
+# accounts yet. It stopped being right the moment reports became something people pay for,
+# because it is a second door to the product that walks straight past every plan limit on
+# /generate/. On a public domain it is an open tab on the AI bill.
+#
+# Kept rather than deleted because it is how the engine is tested against a deployment. The
+# admin dependency is what makes that safe: staff can still call it from the live URL, and
+# for everyone else the address answers 404 — it does not even confirm the route exists.
+router = APIRouter(prefix="/bank-loan", tags=["Bank Loan"],
+                   dependencies=[Depends(get_admin_user)])
 
 
 class BankLoanRequest(BaseModel):
