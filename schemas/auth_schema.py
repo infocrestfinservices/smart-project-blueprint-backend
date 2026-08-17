@@ -44,7 +44,13 @@ class ForgotPasswordRequest(BaseModel):
 
 
 class ForgotPasswordResponse(BaseModel):
-    reset_token: str
+    # The SAME answer whether or not that address has an account. Anything that differs —
+    # a 404, a different wording, even a different response time — turns this endpoint into
+    # a way to ask "is this person a customer of yours?".
+    message: str
+    # Only ever populated on a development machine with no email provider configured, so
+    # local testing is not blocked. Never set in production; see the endpoint.
+    dev_reset_token: Optional[str] = None
 
 
 class ResetPasswordRequest(BaseModel):

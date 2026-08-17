@@ -1,5 +1,9 @@
+import logging
+from urllib.parse import quote
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from config import settings
 from database import get_db
 from models.user_model import User
 import random
@@ -16,7 +20,7 @@ from schemas.auth_schema import (
     ResendOtpRequest,
     RegisterResponse,
 )
-from services.email_service import send_verification_email, email_configured
+from services.email_service import send_password_reset_email, send_verification_email, email_configured
 from services.auth_service import (
     hash_password,
     verify_password,
@@ -25,6 +29,8 @@ from services.auth_service import (
     decode_access_token,
 )
 from dependencies import get_current_user
+
+logger = logging.getLogger("auth")
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -170,22 +176,57 @@ def get_me(current_user: User = Depends(get_current_user)):
 def logout():
     return {"message": "Logged out successfully"}
 
+# The one answer this endpoint ever gives, whatever happened.
+_RESET_SENT = ("If that email address has an account, we have sent a link to reset the "
+               "password. Please check your inbox.")
+
+
 @router.post("/forgot-password", response_model=ForgotPasswordResponse)
-def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+async def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """Email a reset link. Never reveals whether the address has an account.
+
+    This used to RETURN the reset token in the response, so anyone who knew a customer's
+    email could take their account, and it answered 404 for an unknown address, so the same
+    endpoint could be used to find out who the customers were. Both are closed here: the
+    token now only ever travels by email, and the answer is identical either way.
+    """
     email = request.email.lower().strip()
-
     user = db.query(User).filter(User.email == email).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No account found with this email address"
-        )
 
-    # NOTE: With no email service wired up yet, the short-lived reset token is
-    # returned directly so the user can set a new password. Once email is added,
-    # send this token inside a reset link instead of returning it here.
-    reset_token = create_reset_token(user.id)
-    return ForgotPasswordResponse(reset_token=reset_token)
+    if not user:
+        # Deliberately the same reply, and deliberately no lookup-shaped work skipped that
+        # would make this measurably faster than the branch below.
+        logger.info("auth: reset requested for an address with no account")
+        return ForgotPasswordResponse(message=_RESET_SENT)
+
+    token = create_reset_token(user.id)
+    link = f"{settings.FRONTEND_URL.rstrip('/')}/reset-password?token={quote(token)}"
+
+    sent = False
+    try:
+        sent = await send_password_reset_email(
+            user.email, user.full_name, link, settings.RESET_TOKEN_MINUTES)
+    except Exception:
+        # A provider outage must not tell the caller anything either. It is logged so the
+        # failure is visible to us, and the customer is told to check their inbox exactly as
+        # they would have been.
+        logger.exception("auth: reset email failed to send")
+
+    if sent:
+        logger.info("auth: reset link emailed to user %s", user.id)
+        return ForgotPasswordResponse(message=_RESET_SENT)
+
+    # No email provider on this machine. On a development box the token is handed back so
+    # local testing is not blocked — the same accommodation the OTP flow makes. In
+    # production it is never returned: an unsent email is a support problem, and handing the
+    # token to the caller would put back the exact hole this endpoint just closed.
+    if settings.ENV.strip().lower() == "production":
+        logger.error("auth: reset email could not be sent and this is production — "
+                     "RESEND_API_KEY / FROM_EMAIL are not usable")
+        return ForgotPasswordResponse(message=_RESET_SENT)
+
+    logger.warning("auth: no email provider configured; returning the token for local use")
+    return ForgotPasswordResponse(message=_RESET_SENT, dev_reset_token=token)
 
 @router.post("/reset-password", response_model=UserResponse)
 def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):

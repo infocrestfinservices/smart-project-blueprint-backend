@@ -120,6 +120,14 @@ class Settings(BaseSettings):
         return bool(self.RAZORPAY_KEY_ID.strip() and self.RAZORPAY_KEY_SECRET.strip())
 
     SECRET_KEY: str = "changeme"
+    # Where the app lives, used to build links that go INTO emails. A reset link has to be
+    # absolute and has to point at the browser, not at the API — the two are different hosts
+    # in production, and a relative link in an email goes nowhere at all.
+    FRONTEND_URL: str = "http://localhost:5173"
+    # How long a reset link stays usable. Short, because a link that works for a week is a
+    # week in which a forwarded or leaked email is still a working key to the account.
+    RESET_TOKEN_MINUTES: int = 30
+
     RESEND_API_KEY: str = ""
     FROM_EMAIL: str = "onboarding@resend.dev"
     FROM_NAME: str = "Smart Project Blueprint"

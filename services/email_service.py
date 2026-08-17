@@ -64,3 +64,57 @@ async def send_verification_email(email: str, full_name: str, otp: str) -> None:
         raise RuntimeError(
             f"Resend API returned {response.status_code}: {response.text}"
         )
+
+
+def _reset_email_html(full_name: str, link: str, minutes: int) -> str:
+    name = full_name or "there"
+    return f"""\
+<div style="font-family: Arial, Helvetica, sans-serif; max-width: 480px; margin: 0 auto; color: #0F172A;">
+  <h2 style="color: #1B3A6B; margin-bottom: 8px;">Reset your password</h2>
+  <p style="margin: 0 0 16px;">Hi {name},</p>
+  <p style="margin: 0 0 16px;">
+    Someone asked to reset the password on your {settings.FROM_NAME} account. Use the
+    button below to choose a new one. The link works for {minutes} minutes.
+  </p>
+  <p style="margin: 0 0 20px;">
+    <a href="{link}"
+       style="display: inline-block; background: #1B3A6B; color: #ffffff;
+              padding: 12px 22px; border-radius: 8px; text-decoration: none;
+              font-weight: bold;">Choose a new password</a>
+  </p>
+  <p style="margin: 0 0 16px; font-size: 13px; color: #64748B;">
+    If the button doesn't work, paste this into your browser:<br>
+    <span style="word-break: break-all; color: #2563EB;">{link}</span>
+  </p>
+  <p style="margin: 0; font-size: 13px; color: #64748B;">
+    If you didn't ask for this, you can ignore this email — your password has not changed,
+    and nobody can use this link without opening it from your inbox.
+  </p>
+</div>"""
+
+
+async def send_password_reset_email(email: str, full_name: str, link: str,
+                                    minutes: int) -> bool:
+    """Send a password-reset link. Returns True if it was actually sent.
+
+    Returns False rather than raising when email is not configured, because the caller must
+    behave the same either way: the endpoint's answer can never depend on whether the send
+    succeeded, or it would tell a stranger which addresses have accounts.
+    """
+    if not email_configured():
+        return False
+
+    payload = {
+        "from": f"{settings.FROM_NAME} <{settings.FROM_EMAIL}>",
+        "to": [email],
+        "subject": f"Reset your {settings.FROM_NAME} password",
+        "html": _reset_email_html(full_name, link, minutes),
+    }
+    headers = {
+        "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        r = await client.post(RESEND_ENDPOINT, json=payload, headers=headers)
+        r.raise_for_status()
+    return True
