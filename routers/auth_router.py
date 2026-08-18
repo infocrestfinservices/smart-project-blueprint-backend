@@ -20,6 +20,7 @@ from schemas.auth_schema import (
     ResendOtpRequest,
     RegisterResponse,
 )
+from services.entitlements import FREE_PLAN
 from services.email_service import send_password_reset_email, send_verification_email, email_configured
 from services.auth_service import (
     hash_password,
@@ -61,7 +62,12 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
             email=email,
             hashed_password=hash_password(request.password),
             full_name=request.full_name,
-            plan="starter",
+            # NOT "starter" — that is the name of the ₹499 plan, and hardcoding it here put
+            # every new signup on a paid tier they had never bought. The column default is
+            # "free" (1 report, PDF only) and this is the one place that was still
+            # overriding it, so the whole entitlement layer was being bypassed at the front
+            # door.
+            plan=FREE_PLAN,
             is_verified=False,
             email_verification_otp=otp,
             otp_expires_at=otp_expires_at,
