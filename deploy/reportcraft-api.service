@@ -1,0 +1,46 @@
+# systemd unit for the API.
+#
+#   sudo cp reportcraft-api.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now reportcraft-api
+#
+# systemd rather than a bare uvicorn in a terminal: this survives a reboot, restarts on a
+# crash, and writes to the journal instead of nowhere.
+
+[Unit]
+Description=ReportCraft API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=reportcraft
+Group=reportcraft
+WorkingDirectory=/opt/reportcraft/backend
+EnvironmentFile=/opt/reportcraft/backend/.env
+
+# One worker, deliberately. Report generation holds a request open for five to seven minutes
+# and spawns LibreOffice, which is the memory spike on this box; several workers would each
+# be capable of doing that at once and the machine would swap. Scale by adding RAM and
+# raising this together, not by raising it alone.
+ExecStart=/opt/reportcraft/backend/venv/bin/uvicorn main:app \
+  --host 127.0.0.1 --port 8000 --workers 1 --timeout-keep-alive 65
+
+Restart=always
+RestartSec=5
+
+# Generation legitimately takes minutes; systemd must not decide the process is wedged.
+TimeoutStopSec=30
+
+# The app needs its own directory and the system's temp space for LibreOffice, nothing else.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=reportcraft-api
+
+[Install]
+WantedBy=multi-user.target
