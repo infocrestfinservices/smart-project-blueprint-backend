@@ -119,7 +119,24 @@ class Settings(BaseSettings):
     def payments_enabled(self) -> bool:
         return bool(self.RAZORPAY_KEY_ID.strip() and self.RAZORPAY_KEY_SECRET.strip())
 
+    @property
+    def cors_origins(self) -> list[str]:
+        """The origins to allow, or ["*"] when none are configured.
+
+        Falling back to "*" is deliberate for a development machine, where the frontend moves
+        between ports. It is NOT safe in production, and main.py refuses to start that way —
+        a silent wildcard on a live domain is exactly the failure this setting exists to
+        prevent.
+        """
+        raw = [o.strip().rstrip("/") for o in (self.CORS_ORIGINS or "").split(",")]
+        return [o for o in raw if o] or ["*"]
+
     SECRET_KEY: str = "changeme"
+    # Which sites the browser may call this API from, comma separated. Empty means "anything",
+    # which is right on a laptop and wrong the moment this is on a domain. Kept as a plain
+    # string rather than a list because that is what an environment variable can carry.
+    CORS_ORIGINS: str = ""
+
     # Where the app lives, used to build links that go INTO emails. A reset link has to be
     # absolute and has to point at the browser, not at the API — the two are different hosts
     # in production, and a relative link in an email goes nowhere at all.

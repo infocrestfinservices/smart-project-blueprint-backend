@@ -35,9 +35,19 @@ app = FastAPI(
     openapi_url=None,
 )
 
+# Wide-open CORS with credentials allowed is not merely insecure, it does not work: browsers
+# refuse the combination outright, so on a real domain the app's OWN frontend breaks too.
+# Rather than let that be discovered in production, the server refuses to start.
+if IS_PRODUCTION and settings.cors_origins == ["*"]:
+    raise RuntimeError(
+        "CORS_ORIGINS must list your real origins in production, e.g. "
+        "CORS_ORIGINS=https://reportcraft.in,https://www.reportcraft.in — "
+        "allowing every origin with credentials is rejected by browsers anyway."
+    )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
