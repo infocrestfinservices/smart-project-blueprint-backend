@@ -1,19 +1,31 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config import settings
 
-# Hosted Postgres (Neon/Supabase/Render/etc.) silently drops idle connections,
-# after which a pooled connection is dead and the next query fails with
-# "server closed the connection unexpectedly". pool_pre_ping checks each
-# connection with a lightweight SELECT 1 before use and transparently
-# reconnects if it's stale; pool_recycle proactively retires connections that
-# have been open too long. SQLite ignores these harmlessly.
+# Fetch database URL from settings or environment
 _url = settings.DATABASE_URL
-_engine_kwargs = {"pool_pre_ping": True, "pool_recycle": 300}
+
+_engine_kwargs = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
+
 if _url.startswith("sqlite"):
-    # SQLite has no real pool; only needs cross-thread access for FastAPI.
-    _engine_kwargs = {"connect_args": {"check_same_thread": False}}
+    # SQLite configuration for local testing
+    _engine_kwargs["connect_args"] = {"check_same_thread": False}
+else:
+    # PostgreSQL / Supabase Fixes:
+    # 1. Fix old "postgres://" protocol if present
+    if _url.startswith("postgres://"):
+        _url = _url.replace("postgres://", "postgresql://", 1)
+    
+    # 2. Force SSL mode and explicit 10s connect timeout to avoid hanging requests
+    _engine_kwargs["connect_args"] = {
+        "sslmode": "require",
+        "connect_timeout": 10
+    }
 
 engine = create_engine(_url, **_engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
