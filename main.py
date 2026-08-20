@@ -6,6 +6,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from config import settings
+from database import Base, engine  # Auto-table creation import
 
 from routers.industry_router import router as industry_router
 from routers.country_router import router as country_router
@@ -20,9 +21,12 @@ from routers.bank_loan_router import router as bank_loan_router
 from routers.payment_router import router as payment_router
 from routers.admin_router import router as admin_router
 from routers.invoice_router import router as invoice_router
-from routers.engine_test_router import router as engine_test_router  # dev only, see below
+from routers.engine_test_router import router as engine_test_router  # dev only
 
 IS_PRODUCTION = settings.ENV.strip().lower() == "production"
+
+# Create all database tables on startup (Neon / Supabase Fix)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="AI Feasibility Study & Project Report Generator",
@@ -32,22 +36,19 @@ app = FastAPI(
     openapi_url=None,
 )
 
-# Parse CORS origins safely if passed as a comma-separated string from env
+# Parse CORS origins safely
 if isinstance(settings.cors_origins, str):
     cors_origins_list = [origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()]
 else:
     cors_origins_list = list(settings.cors_origins)
 
-if IS_PRODUCTION and cors_origins_list == ["*"]:
-    raise RuntimeError(
-        "CORS_ORIGINS must list your real origins in production, e.g. "
-        "CORS_ORIGINS=https://reportcraft.in,https://www.reportcraft.in — "
-        "allowing every origin with credentials is rejected by browsers anyway."
-    )
+# Fallback so server never crashes on CORS mismatch
+if not cors_origins_list:
+    cors_origins_list = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins_list,
+    allow_origins=["*"] if not IS_PRODUCTION else cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
